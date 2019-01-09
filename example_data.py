@@ -17,7 +17,7 @@ duration = current_time - publish_time
 # True parameter values
 lambda_tips = 0.5
 mu_tips = 1.0
-sig_log_tips = 0.3
+sig_log_tips = 1.9
 
 # Arrival times of tips from poisson process
 expected_num_tips = lambda_tips*duration
