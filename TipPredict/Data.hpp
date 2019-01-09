@@ -19,12 +19,20 @@ class Data
 
     public:
 
+        // Construct empty data
+        Data();
+
         // Constructor. Provide the filename where the data is to be read from
         Data(const char* filename);
 };
 
 
 /* IMPLEMENTATIONS FOLLOW */
+
+Data::Data()
+{
+
+}
 
 Data::Data(const char* filename)
 {
