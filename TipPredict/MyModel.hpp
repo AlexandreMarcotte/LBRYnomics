@@ -33,6 +33,7 @@ class MyModel
         double perturb(DNest4::RNG& rng);
         double log_likelihood() const;
         void print(std::ostream& out) const;
+        std::string description() const;
 
         // Provide a dataset
         static void transfer_data(Data&& _data);
@@ -84,6 +85,24 @@ double MyModel::perturb(DNest4::RNG& rng)
     return logH;
 }
 
+double MyModel::log_likelihood() const
+{
+    double logL = 0.0;
+
+    // TODO
+
+    return logL;
+}
+
+void MyModel::print(std::ostream& out) const
+{
+    out << lambda << ' ' << mu << ' ' << sigma;
+}
+
+std::string MyModel::description() const
+{
+    return "lambda, mu, sigma";
+}
 
 void MyModel::transfer_data(Data&& _data)
 {
