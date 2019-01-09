@@ -1,7 +1,13 @@
 #ifndef TipPredict_Data_hpp
 #define TipPredict_Data_hpp
 
+#include <fstream>
+#include <sstream>
 #include <string>
+#include <nlohmann/json.hpp>
+
+// Shorthand
+using json = nlohmann::json;
 
 namespace TipPredict
 {
@@ -41,7 +47,18 @@ void Data::use_lbry()
     command += url;
     command += " > output.json";
     system(command.c_str());
-}
+
+    // Read json file contents into a string
+    std::fstream fin("output.json", std::ios::in);
+    json claim;
+    fin >> claim;
+    fin.close();
+
+    // Go inside
+    claim = claim[url];
+
+    std::cout << claim["claim"]["supports"] << std::endl;
+} 
 
 } // namespace
 

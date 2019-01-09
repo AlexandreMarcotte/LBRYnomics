@@ -1,6 +1,6 @@
 CXX = g++
 FLAGS = -std=c++17
-INCLUDE =
+INCLUDE = -I json/include
 OPTIM = -O2 -g
 WARN = -Wall -Wextra -pedantic
 ALL = $(FLAGS) $(INCLUDE) $(OPTIM) $(WARN)
