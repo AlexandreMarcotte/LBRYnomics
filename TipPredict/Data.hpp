@@ -28,8 +28,16 @@ class Data
 
 Data::Data(const char* filename)
 {
+    std::cout << "# Loading data from " << filename << "..." << std::flush;
+
     // Read in the data
     std::fstream fin(filename, std::ios::in);
+    if(!fin)
+    {
+        std::cerr << "Failed to open file." << std::endl;
+        return;
+    }
+
     double x, y;
     while(fin >> x && fin >> y)
     {
@@ -37,6 +45,8 @@ Data::Data(const char* filename)
         amounts.push_back(y);
     }
     fin.close();
+
+    std::cout << "done. Found " << times.size() << " tips." << std::endl;
 }
 
 } // namespace
