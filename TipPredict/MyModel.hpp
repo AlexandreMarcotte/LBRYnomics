@@ -89,7 +89,13 @@ double MyModel::log_likelihood() const
 {
     double logL = 0.0;
 
-    // TODO
+    for(int i=0; i<data.num_tips-1; ++i)
+    {
+        // Exponential distribution for gaps
+        double gap = data.times[i+1] - data.times[i];
+
+        
+    }
 
     return logL;
 }

@@ -28,17 +28,24 @@ ts = publish_time + duration*rng.rand(num_tips)
 ts = np.sort(ts)
 
 # Amounts of tips
-ys = mu_tips*np.exp(sig_log_tips*rng.randn(num_tips))
+amounts = mu_tips*np.exp(sig_log_tips*rng.randn(num_tips))
 
-# Save data
-data = np.empty((num_tips, 2))
-data[:,0] = ts
-data[:,1] = ys
-np.savetxt("example_data.txt", data)
+# Save data as YAML
+f = open("example_data.yaml", "w")
+f.write("---\n")
+f.write("publish_time: " + str(publish_time) + "\n")
+f.write("current_time: " + str(current_time) + "\n")
+f.write("times:\n")
+for i in range(num_tips):
+    f.write("    - " + str(ts[i]) + "\n")
+f.write("amounts:\n")
+for i in range(num_tips):
+    f.write("    - " + str(amounts[i]) + "\n")
+f.close()
 
 # Plot tips
-plt.bar(ts, ys, align="center", width=0.3)
-plt.xlabel("Time (days)")
+plt.bar(ts, amounts, align="center", width=0.3)
+plt.xlabel("Time (daamounts)")
 plt.ylabel("Amount (LBC)")
 plt.show()
 
