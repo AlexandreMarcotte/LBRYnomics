@@ -1,11 +1,13 @@
 TipPredict
 ==========
 
-Bayesian extrapolation of LBRY tips. This is work in progress.
+Bayesian extrapolation of LBRY tips. This is work in progress and you probably shouldn't try to use it
+unless you're me.
 
 (c) 2019 Brendon J. Brewer. LICENCE: MIT.
 
 Dependencies:
+
     * DNest4
     * yaml-cpp
 
