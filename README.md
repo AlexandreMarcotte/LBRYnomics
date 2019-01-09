@@ -5,7 +5,9 @@ Bayesian extrapolation of LBRY tips. This is work in progress.
 
 (c) 2019 Brendon J. Brewer. LICENCE: MIT.
 
-Dependency: DNest4. I'll make it more user friendly in time.
+Dependencies:
+    * DNest4
+    * yaml-cpp
 
 Todo list:
 
