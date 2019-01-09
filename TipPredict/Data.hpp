@@ -2,7 +2,6 @@
 #define TipPredict_Data_hpp
 
 #include <string>
-#include "lbry/lbryapi.h"
 
 namespace TipPredict
 {
@@ -37,7 +36,11 @@ Data::Data(std::string _url)
 
 void Data::use_lbry()
 {
-    
+    // Do a VERY DUMB THING
+    std::string command = "/opt/LBRY/resources/static/daemon/lbrynet resolve ";
+    command += url;
+    command += " > output.json";
+    system(command.c_str());
 }
 
 } // namespace
