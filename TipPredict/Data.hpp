@@ -21,6 +21,7 @@ class Data
         // Times and amounts of the tips
         std::vector<double> times;
         std::vector<double> amounts;
+        std::vector<double> log_amounts;
 
         // Number of tips
         int num_tips;
@@ -74,10 +75,16 @@ Data::Data(const char* filename)
     num_tips = yaml["times"].size();
     times.resize(num_tips);
     amounts.resize(num_tips);
+    log_amounts.resize(num_tips);
     for(int i=0; i<num_tips; ++i)
     {
         times[i] = yaml["times"][i].as<double>();
+        if(i != 0)
+            assert(times[i] >= times[i-1]);
+
         amounts[i] = yaml["amounts"][i].as<double>();
+        assert(amounts[i] > 0.0);
+        log_amounts[i] = log(amounts[i]);
     }
 
     std::cout << "done. Found " << num_tips << " tips." << std::endl;

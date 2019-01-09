@@ -89,12 +89,28 @@ double MyModel::log_likelihood() const
 {
     double logL = 0.0;
 
-    for(int i=0; i<data.num_tips-1; ++i)
+    // Try to be super fast
+    double inv_lambda = 1.0/lambda;
+    double log_lambda = log(lambda);
+
+    for(int i=1; i<data.num_tips; ++i)
     {
         // Exponential distribution for gaps
-        double gap = data.times[i+1] - data.times[i];
+        double gap = data.times[i] - data.times[i-1];
+        logL += log_lambda - gap*lambda;
+    }
 
-        
+    // No tip between last tip and end of interval
+    logL += -(data.current_time - data.times.back())*inv_lambda;
+
+    // Now do the tip amounts
+    double C = -0.5*log(2.0*M_PI) - log(sigma);
+    double tau = pow(sigma, -2);
+    double log_mu = log(mu);
+    for(int i=0; i<data.num_tips; ++i)
+    {
+        logL += C - data.log_amounts[i]
+                        - 0.5*tau*pow(data.log_amounts[i] - log_mu, 2);
     }
 
     return logL;
