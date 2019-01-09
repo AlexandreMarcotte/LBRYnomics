@@ -16,7 +16,7 @@ class Data
     private:
 
         // Time interval
-        double publish_time, current_time;
+        double publish_time, current_time, duration;
 
         // Times and amounts of the tips
         std::vector<double> times;
@@ -70,6 +70,7 @@ Data::Data(const char* filename)
     // Check data integrity
     assert(current_time > publish_time);
     assert(yaml["times"].size() == yaml["amounts"].size());
+    duration = current_time - publish_time;
 
     // Extract more
     num_tips = yaml["times"].size();

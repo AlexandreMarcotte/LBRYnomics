@@ -18,6 +18,9 @@ class MyModel
         // A dataset
         static Data data;
 
+        // A throwaway RNG just for forecasts
+        static DNest4::RNG junk_rng;
+
         // Poisson process rate
         double lambda;
 
@@ -43,6 +46,7 @@ class MyModel
 /* IMPLEMENTATIONS FOLLOW */
 
 Data MyModel::data;
+DNest4::RNG MyModel::junk_rng(0);
 
 MyModel::MyModel()
 {
@@ -120,12 +124,35 @@ double MyModel::log_likelihood() const
 void MyModel::print(std::ostream& out) const
 {
     out << std::setprecision(16);
-    out << lambda << ' ' << mu << ' ' << sigma;
+    out << lambda << ' ' << mu << ' ' << sigma << ' ';
+
+    // Forecast total tips over next time interval of length 'duration'
+    double expected_num_tips = lambda*data.duration;
+
+    // Simulate from poisson. This method is expensive for large numbers of
+    // tips.
+    if(expected_num_tips > 1000000)
+    {
+        std::cerr << "# Warning in MyModel::print(std::ostream&) const.";
+        std::cerr << std::endl;
+    }
+
+    double t = data.current_time;
+    double forecast = 0.0;
+    while(true)
+    {
+        t = t - log(1.0 - junk_rng.rand())/lambda;
+        if(t > data.current_time + data.duration)
+            break;
+        forecast += mu*exp(sigma*junk_rng.randn());
+    }
+
+    out << forecast;
 }
 
 std::string MyModel::description() const
 {
-    return "lambda, mu, sigma";
+    return "lambda, mu, sigma, forecast";
 }
 
 void MyModel::transfer_data(Data&& _data)
