@@ -1,9 +1,9 @@
 CXX = g++
 FLAGS = -std=c++17
-INCLUDE = -I .
+INCLUDE = -I CppBry
 OPTIM = -O2 -g
 WARN = -Wall -Wextra -pedantic
-ALL = $(FLAGS) $(OPTIM) $(WARN)
+ALL = $(FLAGS) $(INCLUDE) $(OPTIM) $(WARN)
 
 default:
 	$(CXX) $(ALL) -c main.cpp
