@@ -3,6 +3,7 @@
 
 // Include all headers
 #include "Data.hpp"
+#include "MyModel.hpp"
 
 #endif
 
