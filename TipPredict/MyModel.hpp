@@ -2,6 +2,7 @@
 #define TipPredict_MyModel_hpp
 
 #include "Data.hpp"
+#include <iomanip>
 #include <ostream>
 #include "DNest4/code/RNG.h"
 #include "DNest4/code/Utils.h"
@@ -118,6 +119,7 @@ double MyModel::log_likelihood() const
 
 void MyModel::print(std::ostream& out) const
 {
+    out << std::setprecision(16);
     out << lambda << ' ' << mu << ' ' << sigma;
 }
 
