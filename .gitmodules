@@ -1,0 +1,3 @@
+[submodule "CppBry"]
+	path = CppBry
+	url = https://github.com/osilkin98/CppBry
