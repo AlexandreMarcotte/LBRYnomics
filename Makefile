@@ -1,6 +1,6 @@
 CXX = g++
 FLAGS = -std=c++17
-INCLUDE = -I json/include -I$(DNEST4_PATH)
+INCLUDE = -I $(DNEST4_PATH)
 OPTIM = -O2 -g
 WARN = -Wall -Wextra -pedantic
 ALL = $(FLAGS) $(INCLUDE) $(OPTIM) $(WARN)

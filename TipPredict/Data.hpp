@@ -2,12 +2,7 @@
 #define TipPredict_Data_hpp
 
 #include <fstream>
-#include <sstream>
-#include <string>
-#include <nlohmann/json.hpp>
-
-// Shorthand
-using json = nlohmann::json;
+#include <vector>
 
 namespace TipPredict
 {
@@ -18,47 +13,31 @@ class Data
 {
     private:
 
-        // The URL of the claim being investigated.
-        std::string url;
+        // Times and amounts of the tips
+        std::vector<double> times;
+        std::vector<double> amounts;
 
     public:
 
-        // Constructor. Provide the URL
-        Data(std::string _url);
-
-        // Use LBRY to do something
-        void use_lbry();
-
+        // Constructor. Provide the filename where the data is to be read from
+        Data(const char* filename);
 };
 
 
 /* IMPLEMENTATIONS FOLLOW */
 
-Data::Data(std::string _url)
-:url(std::move(_url))
+Data::Data(const char* filename)
 {
-
-}
-
-void Data::use_lbry()
-{
-    // Do a VERY DUMB THING
-    std::string command = "/opt/LBRY/resources/static/daemon/lbrynet resolve ";
-    command += url;
-    command += " > output.json";
-    system(command.c_str());
-
-    // Read json file contents into a string
-    std::fstream fin("output.json", std::ios::in);
-    json claim;
-    fin >> claim;
+    // Read in the data
+    std::fstream fin(filename, std::ios::in);
+    double x, y;
+    while(fin >> x && fin >> y)
+    {
+        times.push_back(x);
+        amounts.push_back(y);
+    }
     fin.close();
-
-    // Go inside
-    claim = claim[url];
-
-    std::cout << claim["claim"]["supports"] << std::endl;
-} 
+}
 
 } // namespace
 
