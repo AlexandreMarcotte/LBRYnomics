@@ -43,10 +43,18 @@ for i in range(num_tips):
     f.write("    - " + str(amounts[i]) + "\n")
 f.close()
 
-## Plot tips
-#def plot_peaks():
+# Plot tips
+def plot_peaks(ts, ys, color="k", alpha=0.3):
+    """
+    Like a bar plot but with lines.
+    """
+    assert len(ts) == len(ys)
+    for i in range(len(ts)):
+        plt.plot([ts[i], ts[i]], [0.0, ys[i]], "-", color=color, alpha=alpha)
+    plt.ylim([0.0, 1.05*np.max(ys)])
 
-plt.bar(times, amounts, align="center", width=0.3)
+plot_peaks(times, amounts)
+#plt.bar(times, amounts, align="center", width=0.3)
 plt.xlabel("Time (days)")
 plt.ylabel("Amount (LBC)")
 plt.show()
