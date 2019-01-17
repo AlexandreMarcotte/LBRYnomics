@@ -21,11 +21,17 @@ class MyModel
         // A throwaway RNG just for forecasts
         static DNest4::RNG junk_rng;
 
-        // Poisson process rate
+        // Constant poisson process rate
         double lambda;
 
         // Parameters for lognormal tip size
         double mu, sigma;
+
+        // Get instantaneous poisson rate
+        double instantaneous_rate(double t) const;
+
+        // Integrate variable poisson process rate between two times
+        double integrate_rate(double t0, double t1) const;
 
     public:
 
@@ -94,19 +100,19 @@ double MyModel::log_likelihood() const
 {
     double logL = 0.0;
 
-    // Try to be super fast
-    double inv_lambda = 1.0/lambda;
-    double log_lambda = log(lambda);
+    // Beginning of time to first tip
+    logL += log(instantaneous_rate(data.times[0]))
+                    - integrate_rate(data.t_start, data.times[0]);
 
+    // Inter-tip times
     for(int i=1; i<data.num_tips; ++i)
     {
-        // Exponential distribution for gaps
-        double gap = data.times[i] - data.times[i-1];
-        logL += log_lambda - gap*lambda;
+        logL += log(instantaneous_rate(data.times[i]))
+                    - integrate_rate(data.times[i-1], data.times[i]);
     }
 
     // No tip between last tip and end of interval
-    logL += -(data.current_time - data.times.back())*inv_lambda;
+    logL += -integrate_rate(data.times.back(), data.t_end);
 
     // Now do the tip amounts
     double C = -0.5*log(2.0*M_PI) - log(sigma);
@@ -119,6 +125,17 @@ double MyModel::log_likelihood() const
     }
 
     return logL;
+}
+
+double MyModel::instantaneous_rate(double t) const
+{
+    return lambda;
+}
+
+double MyModel::integrate_rate(double t0, double t1) const
+{
+    assert(t0 <= t1);
+    return (t1 - t0)*lambda;
 }
 
 void MyModel::print(std::ostream& out) const
@@ -137,12 +154,12 @@ void MyModel::print(std::ostream& out) const
         std::cerr << std::endl;
     }
 
-    double t = data.current_time;
+    double t = data.t_end;
     double forecast = 0.0;
     while(true)
     {
         t = t - log(1.0 - junk_rng.rand())/lambda;
-        if(t > data.current_time + data.duration)
+        if(t > data.t_end + data.duration)
             break;
         forecast += mu*exp(sigma*junk_rng.randn());
     }

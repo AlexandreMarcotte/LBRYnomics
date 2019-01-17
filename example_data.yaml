@@ -1,6 +1,6 @@
 ---
-publish_time: 2.2
-current_time: 100.7
+t_start: 2.2
+t_end: 100.7
 times:
     - 4.050795342980981
     - 4.191512147872084
