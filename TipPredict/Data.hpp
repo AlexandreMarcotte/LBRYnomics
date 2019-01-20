@@ -13,6 +13,11 @@ namespace TipPredict
 // is the supports for a single claim.
 class Data
 {
+    public:
+
+        // A static instance
+        static Data instance;
+
     private:
 
         // Time interval
@@ -46,6 +51,8 @@ class Data
 
 
 /* IMPLEMENTATIONS FOLLOW */
+
+Data Data::instance;
 
 Data::Data()
 :num_tips(0)

@@ -7,8 +7,7 @@ using namespace TipPredict;
 int main(int argc, char** argv)
 {
     // Load a dataset and transfer it to where it needs to be
-    Data data("example_data.yaml");
-    MyModel::transfer_data(std::move(data));
+    Data::instance = Data("example_data.yaml");
 
     // Run DNest4
     DNest4::start<MyModel>(argc, argv);

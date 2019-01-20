@@ -15,9 +15,6 @@ class MyModel
 {
     private:
 
-        // A dataset
-        static Data data;
-
         // A throwaway RNG just for forecasts
         static DNest4::RNG junk_rng;
 
@@ -44,14 +41,10 @@ class MyModel
         double log_likelihood() const;
         void print(std::ostream& out) const;
         std::string description() const;
-
-        // Provide a dataset
-        static void transfer_data(Data&& _data);
 };
 
 /* IMPLEMENTATIONS FOLLOW */
 
-Data MyModel::data;
 DNest4::RNG MyModel::junk_rng(0);
 
 MyModel::MyModel()
@@ -101,28 +94,28 @@ double MyModel::log_likelihood() const
     double logL = 0.0;
 
     // Get data
-    const auto& times = data.get_times();
-    const auto& log_amounts = data.get_log_amounts();
+    const auto& times = Data::instance.get_times();
+    const auto& log_amounts = Data::instance.get_log_amounts();
 
     // Beginning of time to first tip
     logL += log(instantaneous_rate(times[0]))
-                    - integrate_rate(data.get_t_start(), times[0]);
+                    - integrate_rate(Data::instance.get_t_start(), times[0]);
 
     // Inter-tip times
-    for(int i=1; i<data.get_num_tips(); ++i)
+    for(int i=1; i<Data::instance.get_num_tips(); ++i)
     {
         logL += log(instantaneous_rate(times[i]))
                     - integrate_rate(times[i-1], times[i]);
     }
 
     // No tip between last tip and end of interval
-    logL += -integrate_rate(times.back(), data.get_t_end());
+    logL += -integrate_rate(times.back(), Data::instance.get_t_end());
 
     // Now do the tip amounts
     double C = -0.5*log(2.0*M_PI) - log(sigma);
     double tau = pow(sigma, -2);
     double log_mu = log(mu);
-    for(int i=0; i<data.get_num_tips(); ++i)
+    for(int i=0; i<Data::instance.get_num_tips(); ++i)
     {
         logL += C - log_amounts[i]
                         - 0.5*tau*pow(log_amounts[i] - log_mu, 2);
@@ -148,7 +141,7 @@ void MyModel::print(std::ostream& out) const
     out << lambda << ' ' << mu << ' ' << sigma << ' ';
 
     // Forecast total tips over next time interval of length 'duration'
-    double expected_num_tips = lambda*data.get_duration();
+    double expected_num_tips = lambda*Data::instance.get_duration();
 
     // Simulate from poisson. This method is expensive for large numbers of
     // tips.
@@ -158,12 +151,12 @@ void MyModel::print(std::ostream& out) const
         std::cerr << std::endl;
     }
 
-    double t = data.get_t_end();
+    double t = Data::instance.get_t_end();
     double forecast = 0.0;
     while(true)
     {
         t = t - log(1.0 - junk_rng.rand())/lambda;
-        if(t > data.get_t_end() + data.get_duration())
+        if(t > Data::instance.get_t_end() + Data::instance.get_duration())
             break;
         forecast += mu*exp(sigma*junk_rng.randn());
     }
@@ -174,11 +167,6 @@ void MyModel::print(std::ostream& out) const
 std::string MyModel::description() const
 {
     return "lambda, mu, sigma, forecast";
-}
-
-void MyModel::transfer_data(Data&& _data)
-{
-    std::swap(data, _data);
 }
 
 } // namespace
