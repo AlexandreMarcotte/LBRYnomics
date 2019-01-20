@@ -34,8 +34,14 @@ class Data
         // Constructor. Provide the filename where the data is to be read from
         Data(const char* filename);
 
-        // Give access to MyModel
-        friend class MyModel;
+        // Getters
+        double get_t_start() const { return t_start; }
+        double get_t_end() const { return t_end; }
+        double get_duration() const { return duration; }
+        const std::vector<double>& get_times() const { return times; }
+        const std::vector<double>& get_amounts() const { return amounts; }
+        const std::vector<double>& get_log_amounts() const { return log_amounts; }
+        int get_num_tips() const { return num_tips; }
 };
 
 

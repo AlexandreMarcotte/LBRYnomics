@@ -100,28 +100,32 @@ double MyModel::log_likelihood() const
 {
     double logL = 0.0;
 
+    // Get data
+    const auto& times = data.get_times();
+    const auto& log_amounts = data.get_log_amounts();
+
     // Beginning of time to first tip
-    logL += log(instantaneous_rate(data.times[0]))
-                    - integrate_rate(data.t_start, data.times[0]);
+    logL += log(instantaneous_rate(times[0]))
+                    - integrate_rate(data.get_t_start(), times[0]);
 
     // Inter-tip times
-    for(int i=1; i<data.num_tips; ++i)
+    for(int i=1; i<data.get_num_tips(); ++i)
     {
-        logL += log(instantaneous_rate(data.times[i]))
-                    - integrate_rate(data.times[i-1], data.times[i]);
+        logL += log(instantaneous_rate(times[i]))
+                    - integrate_rate(times[i-1], times[i]);
     }
 
     // No tip between last tip and end of interval
-    logL += -integrate_rate(data.times.back(), data.t_end);
+    logL += -integrate_rate(times.back(), data.get_t_end());
 
     // Now do the tip amounts
     double C = -0.5*log(2.0*M_PI) - log(sigma);
     double tau = pow(sigma, -2);
     double log_mu = log(mu);
-    for(int i=0; i<data.num_tips; ++i)
+    for(int i=0; i<data.get_num_tips(); ++i)
     {
-        logL += C - data.log_amounts[i]
-                        - 0.5*tau*pow(data.log_amounts[i] - log_mu, 2);
+        logL += C - log_amounts[i]
+                        - 0.5*tau*pow(log_amounts[i] - log_mu, 2);
     }
 
     return logL;
@@ -144,7 +148,7 @@ void MyModel::print(std::ostream& out) const
     out << lambda << ' ' << mu << ' ' << sigma << ' ';
 
     // Forecast total tips over next time interval of length 'duration'
-    double expected_num_tips = lambda*data.duration;
+    double expected_num_tips = lambda*data.get_duration();
 
     // Simulate from poisson. This method is expensive for large numbers of
     // tips.
@@ -154,12 +158,12 @@ void MyModel::print(std::ostream& out) const
         std::cerr << std::endl;
     }
 
-    double t = data.t_end;
+    double t = data.get_t_end();
     double forecast = 0.0;
     while(true)
     {
         t = t - log(1.0 - junk_rng.rand())/lambda;
-        if(t > data.t_end + data.duration)
+        if(t > data.get_t_end() + data.get_duration())
             break;
         forecast += mu*exp(sigma*junk_rng.randn());
     }
