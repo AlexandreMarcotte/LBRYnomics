@@ -12,18 +12,18 @@ namespace TipPredict
 class DataFetcher
 {
     private:
-        std::string channel_name;
+        std::string name;
 
     public:
-        DataFetcher(std::string _channel_name);
+        DataFetcher(std::string _name);
 
         void execute();
 
 };
 
 /* IMPLEMENTATIONS FOLLOW */
-DataFetcher::DataFetcher(std::string _channel_name)
-:channel_name(std::move(_channel_name))
+DataFetcher::DataFetcher(std::string _name)
+:name(std::move(_name))
 {
 
 }
@@ -32,7 +32,7 @@ void DataFetcher::execute()
 {
     json response = lbry::LbrydAPI::call(
                       "claim_list",             // method
-                      {{"name", channel_name}}  // param list as a std::map
+                      {{"name", name}}  // param list as a std::map
                     );
 
     /* This returns a JSON-RPC formatted object in the form
@@ -50,7 +50,6 @@ void DataFetcher::execute()
          } 
          */
 
-    std::cout << std::setw(4) << response << std::endl;
     /* this prints out the request as a json-formatted object.
        in order to have it print correctly, use std::setw(4)
        to have it be formatted. The parameter to `std::setw()` 
@@ -58,7 +57,8 @@ void DataFetcher::execute()
     */
 
     // Simply call by the member name to get the body.
-    json response_data = response["result"];
+    json response_data = response["result"]["claims"];
+    std::cout << std::setw(4) << response_data << std::endl;
 }
 
 } // namespace

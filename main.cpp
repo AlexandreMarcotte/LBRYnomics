@@ -7,7 +7,7 @@ using namespace TipPredict;
 int main(int argc, char** argv)
 {
     // Make a data fetcher
-    DataFetcher df("@BrendonBrewer");
+    DataFetcher df("Blog");
     df.execute();
 
 //    // Load a dataset and transfer it to where it needs to be
