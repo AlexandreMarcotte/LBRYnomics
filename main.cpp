@@ -6,6 +6,9 @@ using namespace TipPredict;
 
 int main(int argc, char** argv)
 {
+    // Make a data fetcher
+    DataFetcher df("@BrendonBrewer");
+
     // Load a dataset and transfer it to where it needs to be
     Data::instance = Data("example_data.yaml");
 
