@@ -1,7 +1,9 @@
 #ifndef TipPredict_DataFetcher_hpp
 #define TipPredict_DataFetcher_hpp
 
+#include <algorithm>
 #include "lbry/lbryapi.h"
+#include <sstream>
 #include <string>
 
 using json = nlohmann::json;
@@ -50,15 +52,21 @@ void DataFetcher::execute()
          } 
          */
 
-    /* this prints out the request as a json-formatted object.
-       in order to have it print correctly, use std::setw(4)
-       to have it be formatted. The parameter to `std::setw()` 
-       is the actual indentation value. Change it as you please.
-    */
-
-    // Simply call by the member name to get the body.
-    json response_data = response["result"]["claims"];
-    std::cout << std::setw(4) << response_data << std::endl;
+    json supports = response["result"]["claims"][0]["supports"];
+    for(const auto& support: supports)
+    {
+        std::stringstream ss1;
+        ss1 << support["amount"];
+        std::string s = ss1.str();
+        s.erase(std::remove(s.begin(), s.end(), '\"'), s.end());
+        std::stringstream ss2;
+        ss2 << s;
+        double value;
+        ss2 >> value;
+        std::cout << value << std::endl;
+//        std::cout << support << std::endl;
+    }
+//    std::cout << std::setw(4) << response_data << std::endl;
 }
 
 } // namespace
