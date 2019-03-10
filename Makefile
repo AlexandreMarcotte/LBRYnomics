@@ -8,7 +8,7 @@ ALL = $(FLAGS) $(INCLUDE) $(OPTIM) $(WARN)
 
 default:
 	$(CXX) $(ALL) -c main.cpp
-	$(CXX) -pthread -L $(DNEST4_PATH)/DNest4/code -o main main.o -ldnest4 -lpthread -lyaml-cpp
+	$(CXX) -pthread -L $(DNEST4_PATH)/DNest4/code -L$(CPPBRY_PATH) -o main main.o -lpthread -lcurl -lcurlpp -lcppbry -ldnest4 -lyaml-cpp
 	rm -f main.o
 
 
