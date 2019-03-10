@@ -1,6 +1,7 @@
 CXX = g++
 FLAGS = -std=c++17
-INCLUDE = -I $(DNEST4_PATH)
+CPPBRY_PATH = /home/brewer/Projects/CppBRY
+INCLUDE = -I $(DNEST4_PATH) -I $(CPPBRY_PATH) -I $(CPPBRY_PATH)/third_party/json/include
 OPTIM = -O3 -march=native
 WARN = -Wall -Wextra -pedantic
 ALL = $(FLAGS) $(INCLUDE) $(OPTIM) $(WARN)
