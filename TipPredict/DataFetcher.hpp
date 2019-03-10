@@ -32,7 +32,7 @@ void DataFetcher::execute()
 {
     json response = lbry::LbrydAPI::call(
                       "claim_list",             // method
-                      {{"name", "bellflower"}}  // param list as a std::map
+                      {{"name", channel_name}}  // param list as a std::map
                     );
 
     /* This returns a JSON-RPC formatted object in the form
