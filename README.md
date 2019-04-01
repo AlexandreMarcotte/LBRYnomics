@@ -10,6 +10,7 @@ Dependencies:
 
     * DNest4
     * yaml-cpp
+    * Python 3 and some packages for it like numpy.
 
 Model idea:
 
