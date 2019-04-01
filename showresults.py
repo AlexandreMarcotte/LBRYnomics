@@ -17,14 +17,13 @@ amount = posterior_sample[:,-1]
 amount = np.sort(amount)
 n = len(amount)
 indices = [ int(0.1*n), int(0.5*n), int(0.9*n) ]
-quantiles = amount[indices]
+tip_rate = amount/(data["t_end"] - data["t_start"])*1000.0
+quantiles = tip_rate[indices]
 
-tip_rate = posterior_sample[:,-1]/(data["t_end"] - data["t_start"])*1000.0
-
-print("Future tip rate per 1000 blocks (10%, 50%, 90% quantiles): ",
-      np.round(quantiles, 2), "LBC.")
+print("Future tip rate (10%, 50%, 90% quantiles): ",
+      np.round(quantiles, 2), "LBC per 1000 blocks.")
 
 plt.hist(tip_rate, 100)
-plt.xlabel("Future tip rate (LBC per kiloblock)")
+plt.xlabel("Future tip rate (LBC per 1000 blocks)")
 plt.show()
 
