@@ -3,19 +3,67 @@ from ira import *
 # Initialise one of these things
 lbry = lbryRPC()
 
-# Channel name and page size
-channel = "@BrendonBrewer"
-page_size = 100 # There better be less claims than this, or I'll need more pages
+def get_data(channel_name, page_size=10):
+    """
+    Get all the data from a given channel and return it in a nice
+    format (list of dicts).
+    """
 
-# Get a lbry call
-result = lbry.claim_list_by_channel(channel, page=1, page_size=page_size)
+    # Get number of claims and number of pages
+    result = lbry.claim_list_by_channel(channel_name, page=0)
+    num_claims = result[0][channel_name]["claims_in_channel"]
+    num_pages = 1 + num_claims // page_size
 
-# Go where the important stuff is
-claims = result[0][channel]["claims_in_channel"]
+    # Loop over the claims, pack the required data into a list
+    data = []
+    for page in range(1, num_pages+1):
+        result = lbry.claim_list_by_channel(channel_name,
+                                            page=page, page_size=page_size)
 
-# Loop over the claims, get supports
-for claim in claims:
-    support = claim["supports"]
-    if len(support) > 0:
-        print(support)
+        # Go where the important stuff is
+        claims = result[0][channel_name]["claims_in_channel"]
+
+        for claim in claims:
+
+            # Get the block height of the transaction
+            height = claim["height"]
+
+            # Get the supports
+            supports = claim["supports"]
+
+            # Get the heights and amounts of the supports
+            this_claim_data = {}
+            support_heights = []
+            support_amounts = []
+
+            for support in supports:
+                try:
+                    support_tx = lbry.lbry_call("transaction_show",
+                                            {"txid": support["txid"]})
+                    support_heights.append(support_tx[0]["height"])
+                    support_amounts.append(float(support["amount"]))
+                except:
+                    print("Error encountered. Trying again in 5 seconds.")
+                    import time
+                    time.sleep(5.0)
+
+                    support_tx = lbry.lbry_call("transaction_show",
+                                            {"txid": support["txid"]})
+                    support_heights.append(support_tx[0]["height"])
+                    support_amounts.append(float(support["amount"]))
+
+            this_claim_data["claim_height"] = height
+            this_claim_data["support_heights"] = support_heights
+            this_claim_data["support_amounts"] = support_amounts
+            this_claim_data["num_supports"] = len(support_heights)
+
+            data.append(this_claim_data)
+            print("Processed claim {num}.".format(num=len(data)))
+            print(this_claim_data)
+            print("\n\n\n\n", flush=True)
+
+    return data
+
+
+x = get_data("@JordanBPeterson")
 
