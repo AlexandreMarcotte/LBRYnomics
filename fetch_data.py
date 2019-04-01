@@ -92,6 +92,10 @@ def write_flattened(data, filename="data.yaml"):
     t_end = max([t_end, max(times)])
     f.write("t_end: " + str(t_end) + "\n")
 
+    # Put tips in forward time order
+    times = times[::-1]
+    amounts = amounts[::-1]
+
     f.write("times:\n")
     for time in times:
         f.write("    - " + str(time) + "\n")
@@ -100,9 +104,10 @@ def write_flattened(data, filename="data.yaml"):
         f.write("    - " + str(amount) + "\n")
 
     f.close()
+    print("Output written to " + filename + ".")
 
 
 if __name__ == "__main__":
-    data = get_data("@BrendonBrewer")
+    data = get_data("@TheCryptoLark")
     write_flattened(data)
 
