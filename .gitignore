@@ -1,3 +1,5 @@
+__pycache__
+data.yaml
 main
 levels.txt
 log_prior_weights.txt
