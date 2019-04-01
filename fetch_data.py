@@ -1,4 +1,6 @@
 from ira import *
+import numpy as np
+import numpy.random as rng
 import time
 
 # Initialise one of these things
@@ -74,14 +76,9 @@ def write_flattened(data, filename="data.yaml"):
     # Extract times of claims, to get a start and time
     # (violating model assumptions slightly - end time should be current block
     # height, model should be modified so start time is first claim)
-    times = []
+    claim_times = []
     for claim in data:
-        times.append(claim["claim_height"])
-
-    f = open(filename, "w")
-    f.write("---\n")
-    f.write("t_start: " + str(min(times)) + "\n")
-    t_end = max(times)
+        claim_times.append(claim["claim_height"] + rng.rand())
 
     # Get tip times and amounts
     times = []
@@ -89,10 +86,21 @@ def write_flattened(data, filename="data.yaml"):
     for claim in data:
         times   = times + claim["support_heights"]
         amounts = amounts + claim["support_amounts"]
-    t_end = max([t_end, max(times)])
-    f.write("t_end: " + str(t_end) + "\n")
+    times = np.array(times) + rng.rand(len(times))
+    times = np.sort(times)
+    times = times[::-1]
+
+    t_start = min(np.hstack([times, claim_times]))
+    t_end   = max(np.hstack([times, claim_times]))
+
+    f = open(filename, "w")
+    f.write("---\n")
+    f.write("t_start: " + str(t_start) + "\n")
+    f.write("t_end: "   + str(t_end) + "\n")
 
     # Put tips in forward time order
+    # TODO: Remove this stupid randomisation to break ties on times
+    # and fix the model properly to work in discrete time.
     times = times[::-1]
     amounts = amounts[::-1]
 
