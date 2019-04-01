@@ -65,5 +65,18 @@ def get_data(channel_name, page_size=10):
     return data
 
 
-x = get_data("@JordanBPeterson")
+
+def write_flattened(data, filename="data.yaml"):
+    """
+    Input: a data list as output by get_data().
+    Output: a YAML dataset in the current format.
+    """
+    f = open(filename, "w")
+    f.write("---")
+    f.close()
+
+
+if __name__ == "__main__":
+    x = get_data("@TheCryptoLark")
+    write_flattened(data)
 
