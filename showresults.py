@@ -20,8 +20,12 @@ indices = [ int(0.1*n), int(0.5*n), int(0.9*n) ]
 future_tips = amount
 quantiles = future_tips[indices]
 
-print("Total tips forecast over next 10,000 blocks: (10%, 50%, 90% quantiles): ",
-      np.round(quantiles, 2), "LBC.")
+print("")
+print("Assuming things keep rolling along more or less as they have been, I")
+print("predict, with 90% probability, that you'll receive between")
+print(np.round(quantiles[0], 2), "and", np.round(quantiles[2], 2), "LBC",
+      end=" ")
+print("over the next 10,000 blocks.")
 
 plt.hist(future_tips, 500, density=True)
 plt.xlabel("Future tips over next 10,000 blocks (LBC)")
