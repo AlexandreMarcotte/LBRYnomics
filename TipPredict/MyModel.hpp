@@ -141,7 +141,7 @@ void MyModel::print(std::ostream& out) const
     out << lambda << ' ' << mu << ' ' << sigma << ' ';
 
     // Forecast total tips over next time interval of length 'duration'
-    double expected_num_tips = lambda*Data::instance.get_duration();
+    double expected_num_tips = 10000.0*lambda;//*Data::instance.get_duration();
 
     // Simulate from poisson. This method is expensive for large numbers of
     // tips.
