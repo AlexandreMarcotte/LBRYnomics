@@ -25,10 +25,10 @@ print("Assuming things keep rolling along more or less as they have been, I")
 print("predict, with 90% probability, that you'll receive between")
 print(np.round(quantiles[0], 2), "and", np.round(quantiles[2], 2), "LBC",
       end=" ")
-print("over the next 10,000 blocks.")
+print("over the next month.")
 
 plt.hist(future_tips, 500, density=True)
-plt.xlabel("Future tips over next 10,000 blocks (LBC)")
+plt.xlabel("Future tips over next month (LBC)")
 plt.ylabel("Probability Density")
 plt.show()
 

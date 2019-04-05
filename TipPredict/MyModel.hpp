@@ -140,8 +140,8 @@ void MyModel::print(std::ostream& out) const
     out << std::setprecision(16);
     out << lambda << ' ' << mu << ' ' << sigma << ' ';
 
-    // Forecast total tips over next time interval of length 'duration'
-    double expected_num_tips = 10000.0*lambda;//*Data::instance.get_duration();
+    // Forecast total tips over next month
+    double expected_num_tips = 17532.0*lambda;//*Data::instance.get_duration();
 
     // Simulate from poisson. This method is expensive for large numbers of
     // tips.
