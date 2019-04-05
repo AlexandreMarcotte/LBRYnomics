@@ -49,11 +49,10 @@ def get_data(channel_name, page_size=100):
                                                 {"txid": support["txid"]})
                         support_heights.append(support_tx[0]["height"])
                         support_amounts.append(float(support["amount"]))
+                        print(".", end="", flush=True)
                         break
                     except:
                         time.sleep(1.0)
-
-                    print(".", end="", flush=True)
 
             this_claim_data["claim_height"] = height
             this_claim_data["support_heights"] = support_heights
