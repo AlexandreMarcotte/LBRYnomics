@@ -10,7 +10,7 @@ channels = ["@Lunduke", "@NaomiBrockwell", "@TheLinuxGamer",
             "@MinutePhysics", "@GamesGlitches",
             "@upside", "@OpenSourceGames", "@paulvanderklay",
             "@JordanBPeterson", "@Crypt0", "@MothersBasement",
-            "@imineblocks", "tioaventurabus"]
+            "@imineblocks", "@tioaventurabus"]
 
 f = open("forecasts.csv", "w")
 f.write("channel_name,forecast_lower,forecast_medium,forecast_upper\n")

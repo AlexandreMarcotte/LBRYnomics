@@ -14,7 +14,12 @@ def get_data(channel_name, page_size=100):
 
     # Get number of claims and number of pages
     result = lbry.claim_list_by_channel(channel_name, page=0)
-    num_claims = result[0][channel_name]["claims_in_channel"]
+
+    try:
+        num_claims = result[0][channel_name]["claims_in_channel"]
+    except:
+        print("Channel " + channel_name + "failed.")
+
     num_pages = 1 + num_claims // page_size
 
     # Loop over the claims, pack the required data into a list
