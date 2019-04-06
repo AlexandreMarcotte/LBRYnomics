@@ -1,4 +1,5 @@
 import fetch_data
+import numpy as np
 import showresults
 import subprocess
 
@@ -22,9 +23,9 @@ for channel in channels:
     quantiles = showresults.postprocess()
 
     f.write(channel + ",")
-    f.write(str(quantiles[0]) + ",")
-    f.write(str(quantiles[1]) + ",")
-    f.write(str(quantiles[2]) + "\n")
+    f.write(str(np.round(quantiles[0], 2)) + ",")
+    f.write(str(np.round(quantiles[1], 2)) + ",")
+    f.write(str(np.round(quantiles[2], 2)) + "\n")
     f.flush()
 
 f.close()
