@@ -1,5 +1,6 @@
 __pycache__
 data.yaml
+forecasts.csv
 main
 levels.txt
 log_prior_weights.txt
