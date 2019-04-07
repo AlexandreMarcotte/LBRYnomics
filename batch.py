@@ -4,18 +4,18 @@ import showresults
 import subprocess
 
 # List of channels to make forecasts for
-channels = ["@Lunduke", "@NaomiBrockwell", "@TheLinuxGamer",
-            "@TheCryptoLark", "@CryptoCandor", "@mikenayna",
-            "@no1marmadukefan", "@TechFox", "@GaminGHD",
-            "@MinutePhysics", "@GamesGlitches",
-            "@upside", "@OpenSourceGames", "@paulvanderklay",
-            "@JordanBPeterson", "@Crypt0", "@MothersBasement",
-            "@imineblocks", "@tioaventurabus", "@leckakay", "@Luke",
-            "@akirathedon", "@davidpakman", "@timcast", "@AntiMedia",
-            "@water", "@bitcoinandfriends", "@ShutupAndPlay",
-            "@reenthused", "@CatholicHomilies", "@NameThatTune",
-            "@txgarage", "@TipWhatYouLike", "@MusicPlanet",
-            "@3Blue1Brown"]
+channels = sorted(["@Lunduke", "@NaomiBrockwell", "@TheLinuxGamer",
+                   "@TheCryptoLark", "@CryptoCandor", "@mikenayna",
+                   "@no1marmadukefan", "@TechFox", "@GaminGHD",
+                   "@MinutePhysics", "@GamesGlitches",
+                   "@upside", "@OpenSourceGames", "@paulvanderklay",
+                   "@JordanBPeterson", "@Crypt0", "@MothersBasement",
+                   "@imineblocks", "@tioaventurabus", "@leckakay", "@Luke",
+                   "@akirathedon", "@davidpakman", "@timcast", "@AntiMedia",
+                   "@water", "@bitcoinandfriends", "@ShutupAndPlay",
+                   "@reenthused", "@CatholicHomilies", "@NameThatTune",
+                   "@txgarage", "@TipWhatYouLike", "@MusicPlanet",
+                   "@3Blue1Brown"]
 
 f = open("forecasts.csv", "w")
 f.write("channel_name,forecast_low,forecast_medium,forecast_high\n")
