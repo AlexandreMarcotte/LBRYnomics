@@ -86,6 +86,8 @@ def write_flattened(data, filename="data.yaml"):
     claim_times = []
     for claim in data:
         claim_times.append(claim["claim_height"] + rng.rand())
+    claim_times = np.array(claim_times)
+    claim_times = np.sort(claim_times)
 
     # Get tip times and amounts
     times = []
@@ -109,11 +111,18 @@ def write_flattened(data, filename="data.yaml"):
     times = np.sort(times)
     amounts = amounts[::-1]
 
+    # Open the YAML output file
     f = open(filename, "w")
     f.write("---\n")
     f.write("t_start: " + str(t_start) + "\n")
     f.write("t_end: "   + str(current_time) + "\n")
 
+    # Save claim times
+    f.write("claim_times:\n")
+    for claim_time in claim_times:
+        f.write("    - " + str(claim_time) + "\n")
+
+    # Save tip times and amounts
     f.write("times:\n")
     for time in times:
         f.write("    - " + str(time) + "\n")
