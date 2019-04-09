@@ -23,6 +23,9 @@ class Data
         // Time interval
         double t_start, t_end, duration;
 
+        // Times of claims
+        std::vector<double> claim_times;
+
         // Times and amounts of the tips
         std::vector<double> times;
         std::vector<double> amounts;
@@ -43,6 +46,8 @@ class Data
         double get_t_start() const { return t_start; }
         double get_t_end() const { return t_end; }
         double get_duration() const { return duration; }
+        const std::vector<double>& get_claim_times() const
+        { return claim_times; }
         const std::vector<double>& get_times() const { return times; }
         const std::vector<double>& get_amounts() const { return amounts; }
         const std::vector<double>& get_log_amounts() const { return log_amounts; }
@@ -84,6 +89,9 @@ Data::Data(const char* filename)
     assert(t_end > t_start);
     assert(yaml["times"].size() == yaml["amounts"].size());
     duration = t_end - t_start;
+
+    // Extract claim times
+    claim_times = yaml["claim_times"].as<std::vector<double>>();
 
     // Extract more
     num_tips = yaml["times"].size();
