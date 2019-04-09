@@ -141,7 +141,7 @@ void MyModel::print(std::ostream& out) const
     out << lambda << ' ' << mu << ' ' << sigma << ' ';
 
     // Forecast total tips over next month
-    double prediction_interval = 17532.0;
+    static constexpr double prediction_interval = 17532.0;
     double expected_num_tips = integrate_rate
                 (Data::instance.get_t_end(),
                  Data::instance.get_t_end() + prediction_interval);
