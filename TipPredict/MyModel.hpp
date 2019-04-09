@@ -21,6 +21,13 @@ class MyModel
         // Constant poisson process rate
         double lambda;
 
+        // Pulses - amplitude hyperparameter in units of lambda
+        double pulse_amplitude;
+
+        // Latent N(0, 1) coordinates and the pulse amplitudes
+        std::vector<double> ns;
+        std::vector<double> As;
+
         // Parameters for lognormal tip size
         double mu, sigma;
 
@@ -48,6 +55,8 @@ class MyModel
 DNest4::RNG MyModel::junk_rng(0);
 
 MyModel::MyModel()
+:ns(Data::instance.get_claim_times().size())
+,As(Data::instance.get_claim_times().size())
 {
 
 }
