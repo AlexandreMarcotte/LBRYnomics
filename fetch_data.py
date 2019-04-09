@@ -86,6 +86,7 @@ def write_flattened(data, filename="data.yaml"):
     claim_times = []
     for claim in data:
         claim_times.append(claim["claim_height"] + rng.rand())
+    t_start = np.min(claim_times)
 
     # Get tip times and amounts
     times = []
@@ -95,7 +96,6 @@ def write_flattened(data, filename="data.yaml"):
         amounts = amounts + claim["support_amounts"]
     times = np.array(times)
     amounts = np.array(amounts)
-    t_start = np.min(times)
 
     # Remove anything that's before the first claim
     good = times >= t_start
