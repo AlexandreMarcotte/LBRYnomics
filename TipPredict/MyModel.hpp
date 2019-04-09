@@ -22,11 +22,12 @@ class MyModel
         double lambda;
 
         // Pulses - amplitude hyperparameter in units of lambda
-        double pulse_amplitude;
+        double pulse_height;
 
         // Latent N(0, 1) coordinates and the pulse amplitudes
         std::vector<double> ns;
         std::vector<double> As;
+        void compute_As();
 
         // Parameters for lognormal tip size
         double mu, sigma;
@@ -61,9 +62,20 @@ MyModel::MyModel()
 
 }
 
+void MyModel::compute_As()
+{
+    for(size_t i=0; i<ns.size(); ++i)
+        As[i] = pulse_height*lambda*exp(ns[i]);
+}
+
 void MyModel::from_prior(DNest4::RNG& rng)
 {
     lambda = exp(log(1E-4) + log(1E6)*rng.rand());
+    pulse_height = exp(3.0*rng.randn());
+    for(size_t i=0; i<ns.size(); ++i)
+        ns[i] = rng.randn();
+    compute_As();
+
     mu = exp(rng.randn());
     sigma = 0.05 + 4.95*rng.rand();
 }
@@ -72,7 +84,7 @@ double MyModel::perturb(DNest4::RNG& rng)
 {
     double logH = 0.0;
 
-    int which = rng.rand_int(3);
+    int which = rng.rand_int(6);
 
     if(which == 0)
     {
@@ -81,7 +93,28 @@ double MyModel::perturb(DNest4::RNG& rng)
         DNest4::wrap(lambda, log(1E-4), log(1E2));
         lambda = exp(lambda);
     }
-    else if(which == 1)
+    else if(which == 2)
+    {
+        pulse_height = log(pulse_height);
+        logH -= -0.5*pow(pulse_height/3.0, 2);
+        pulse_height += 3.0*rng.randh();
+        logH += -0.5*pow(pulse_height/3.0, 2);
+        pulse_height = exp(pulse_height);
+
+        compute_As();
+    }
+    else if(which == 3)
+    {
+        int k = rng.rand_int(ns.size());
+
+        logH -= -0.5*pow(ns[k], 2);
+        ns[k] += rng.randh();
+        logH += -0.5*pow(ns[k], 2);
+
+        // This could be made more efficient by only doing element k
+        compute_As();
+    }
+    else if(which == 4)
     {
         mu = log(mu);
         logH -= -0.5*pow(mu, 2);
@@ -147,7 +180,7 @@ double MyModel::integrate_rate(double t0, double t1) const
 void MyModel::print(std::ostream& out) const
 {
     out << std::setprecision(16);
-    out << lambda << ' ' << mu << ' ' << sigma << ' ';
+    out << lambda << ' ' << pulse_height << ' ' << mu << ' ' << sigma << ' ';
 
     // Forecast total tips over next month
     double expected_num_tips = 17532.0*lambda;//*Data::instance.get_duration();
