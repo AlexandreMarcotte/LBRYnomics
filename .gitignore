@@ -1,3 +1,6 @@
+Docs/*.aux
+Docs/*.log
+Docs/*.pdf
 __pycache__
 data.yaml
 forecasts.csv

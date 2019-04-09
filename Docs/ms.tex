@@ -1,0 +1,46 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{dsfont}
+\usepackage[left=2cm, right=2cm, bottom=3cm, top=2cm]{geometry}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\usepackage{natbib}
+
+\title{Poisson process notes}
+\author{Brendon J. Brewer}
+\date{}
+
+\begin{document}
+\maketitle
+
+%\abstract{\noindent Abstract}
+
+% Need this after the abstract
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{8pt}
+
+Let $\lambda(t)$ be the rate function. In the current implementation
+it is constant, $\lambda(t) = \lambda$,
+but it won't always be.
+
+\section{Handling of discrete time}
+Time is block height, where one unit equals 2.5 minutes.
+The probability of $x_t$ tips in block $t$ is
+\begin{align}
+p(x_t \,|\, \lambda_t) &= \frac{\lambda_t^{x_t}\exp(-\lambda_t)}{x_t!}
+\end{align}
+
+Currently the data starts from the first claim and ends at the current
+block height. Any tips before the first claim are considered spurious and
+discarded.
+
+Discrete time is currently handled by adding a random offset to the
+block times, but that's what I want to fix.
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}
+
