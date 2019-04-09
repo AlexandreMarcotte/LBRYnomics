@@ -1,4 +1,4 @@
-Disclaimer: This information is provided for entertainment purposes only.
+DISCLAIMER: This information is provided for entertainment purposes only. For instance, prior to 2019-04-10, there was a very dumb bug which made the numbers all wrong. Hey, at least *that* bug is gone now.
 
 I used TipPredict (https://github.com/eggplantbren/TipPredict) to forecast LBC tips received over the next month for some publishers on LBRY. This is a CSV file containing a low, a medium, and a high prediction for each of the creators on the list. The assumptions I used were quite basic "status quo" type assumptions, which assume that the next month is quite likely to look similar to previous months. If people find this service useful, I can make the assumptions much more realistic and sophisticated, including things like trends, and spikes when you publish.
 
