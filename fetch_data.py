@@ -6,6 +6,9 @@ import time
 # Initialise one of these things
 lbry = lbryRPC()
 
+# Get current block height
+current_time = lbry.lbry_call("status")[0]["wallet"]["blocks"]
+
 def get_data(channel_name, page_size=100):
     """
     Get all the data from a given channel and return it in a nice
@@ -90,23 +93,26 @@ def write_flattened(data, filename="data.yaml"):
     for claim in data:
         times   = times + claim["support_heights"]
         amounts = amounts + claim["support_amounts"]
-    times = np.array(times) + rng.rand(len(times))
-    times = np.sort(times)
-    times = times[::-1]
+    times = np.array(times)
+    amounts = np.array(amounts)
+    t_start = np.min(times)
 
-    t_start = min(np.hstack([times, claim_times]))
-    t_end   = max(np.hstack([times, claim_times]))
-
-    f = open(filename, "w")
-    f.write("---\n")
-    f.write("t_start: " + str(t_start) + "\n")
-    f.write("t_end: "   + str(t_end) + "\n")
+    # Remove anything that's before the first claim
+    good = times >= t_start
+    times = times[good]
+    amounts = amounts[good]
 
     # Put tips in forward time order
     # TODO: Remove this stupid randomisation to break ties on times
     # and fix the model properly to work in discrete time.
-    times = times[::-1]
+    times = times + rng.rand(len(times))
+    times = np.sort(times)
     amounts = amounts[::-1]
+
+    f = open(filename, "w")
+    f.write("---\n")
+    f.write("t_start: " + str(t_start) + "\n")
+    f.write("t_end: "   + str(current_time) + "\n")
 
     f.write("times:\n")
     for time in times:
