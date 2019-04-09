@@ -141,13 +141,16 @@ void MyModel::print(std::ostream& out) const
     out << lambda << ' ' << mu << ' ' << sigma << ' ';
 
     // Forecast total tips over next month
-    double expected_num_tips = 17532.0*lambda;//*Data::instance.get_duration();
+    double prediction_interval = 17532.0;
+    double expected_num_tips = integrate_rate
+                (Data::instance.get_t_end(),
+                 Data::instance.get_t_end() + prediction_interval);
 
     // Simulate from poisson. This method is expensive for large numbers of
     // tips.
     if(expected_num_tips > 1000000)
     {
-        std::cerr << "# Warning in MyModel::print(std::ostream&) const.";
+        std::cerr << "# Expect slowness in MyModel::print(std::ostream&) const.";
         std::cerr << std::endl;
     }
 
@@ -156,7 +159,7 @@ void MyModel::print(std::ostream& out) const
     while(true)
     {
         t = t - log(1.0 - junk_rng.rand())/lambda;
-        if(t > Data::instance.get_t_end() + Data::instance.get_duration())
+        if(t > Data::instance.get_t_end() + prediction_interval)
             break;
         forecast += mu*exp(sigma*junk_rng.randn());
     }
