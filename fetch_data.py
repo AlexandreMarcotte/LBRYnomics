@@ -97,8 +97,9 @@ def write_flattened(data, filename="data.yaml"):
     times = np.array(times)
     amounts = np.array(amounts)
 
-    # Remove anything that's before the first claim
-    good = times >= t_start
+    # Remove any tip that's before the first claim
+    # or after the current time.
+    good = (times >= t_start) & (times < t_end)
     times = times[good]
     amounts = amounts[good]
 
