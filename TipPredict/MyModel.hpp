@@ -189,7 +189,7 @@ void MyModel::print(std::ostream& out) const
                  Data::instance.get_t_end() + prediction_interval);
 
     // Simulate from poisson. This method is expensive for large numbers of
-    // tips.
+    // tips. TODO: The algorithm will have to change in the pulses branch.
     if(expected_num_tips > 1000000)
     {
         std::cerr << "# Expect slowness in MyModel::print(std::ostream&) const.";
