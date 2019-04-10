@@ -99,7 +99,7 @@ def write_flattened(data, filename="data.yaml"):
 
     # Remove any tip that's before the first claim
     # or after the current time.
-    good = (times >= t_start) & (times < t_end)
+    good = (times >= t_start) & (times < current_time)
     times = times[good]
     amounts = amounts[good]
 
