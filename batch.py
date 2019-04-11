@@ -18,9 +18,10 @@ channels = sorted(["@Lunduke", "@NaomiBrockwell", "@TheLinuxGamer",
                    "@3Blue1Brown", "@altcoinbuzz", "@BrendonBrewer",
                    "@anton", "@ModerateConservative", "@LBRY-Social",
                    "@zO-Music", "@KhanAcademy", "@Michaelcraigheadart",
-                   "@postjazzrdg", "@kcSebOfficial", "@KJamesElliott",
+                   "@postjazzrdg", "@kcSebOfficial",
                    "@DanielSibisan", "@jeradhill", "@JuliaGalef",
-                   "@KhanAcademy", "@NorVegan", "@VeganGains"],
+                   "@KhanAcademy", "@NorVegan", "@VeganGains",
+                   "@KJamesElliott#36aab723dc34a5e5d4173436f01c7c3457493201"],
                     key=lambda s: s.lower())
 
 f = open("forecasts.csv", "w")
