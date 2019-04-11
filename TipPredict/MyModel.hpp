@@ -140,8 +140,11 @@ double MyModel::log_likelihood() const
     const auto& log_amounts = Data::instance.get_log_amounts();
 
     // Beginning of time to first tip
-    logL += log(instantaneous_rate(times[0]))
+    if(times.size() > 0)
+    {
+        logL += log(instantaneous_rate(times[0]))
                     - integrate_rate(Data::instance.get_t_start(), times[0]);
+    }
 
     // Inter-tip times
     for(int i=1; i<Data::instance.get_num_tips(); ++i)
@@ -151,7 +154,8 @@ double MyModel::log_likelihood() const
     }
 
     // No tip between last tip and end of interval
-    logL += -integrate_rate(times.back(), Data::instance.get_t_end());
+    logL += -integrate_rate((times.size() > 0)?(times.back()):(Data::instance.get_t_start()),
+                                Data::instance.get_t_end());
 
     // Now do the tip amounts
     double C = -0.5*log(2.0*M_PI) - log(sigma);
