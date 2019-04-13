@@ -26,7 +26,7 @@ channels = sorted(["@Lunduke", "@NaomiBrockwell", "@TheLinuxGamer",
                     key=lambda s: s.lower())
 
 f = open("forecasts.csv", "w")
-f.write("channel_name,forecast_low,forecast_medium,forecast_high,notes\n")
+f.write("channel_name,months_active,total_tips_received,forecast_low,forecast_medium,forecast_high,notes\n")
 f.flush()
 
 for channel in channels:
@@ -42,11 +42,13 @@ for channel in channels:
     quantiles = showresults.postprocess()
 
     f.write(channel + ",")
+    f.write(str(np.round((data["t_end"] - data["t_start"])/17532.0, 2)) + ",")
+    f.write(str(np.round(np.sum(data["amounts"]), 2)) + ",")
     f.write(str(np.round(quantiles[0], 2)) + ",")
     f.write(str(np.round(quantiles[1], 2)) + ",")
     f.write(str(np.round(quantiles[2], 2)) + ",")
 
-    if data["t_end"] - data["t_start"] < 10732.0:
+    if data["t_end"] - data["t_start"] < 17532.0:
         f.write("channel has existed for less than one month")
     f.write("\n")
     f.flush()
