@@ -26,19 +26,29 @@ channels = sorted(["@Lunduke", "@NaomiBrockwell", "@TheLinuxGamer",
                     key=lambda s: s.lower())
 
 f = open("forecasts.csv", "w")
-f.write("channel_name,forecast_low,forecast_medium,forecast_high\n")
+f.write("channel_name,forecast_low,forecast_medium,forecast_high,notes\n")
 f.flush()
 
 for channel in channels:
     data = fetch_data.get_data(channel)
     fetch_data.write_flattened(data)
+
+    import yaml
+    yaml_file = open("data.yaml")
+    data = yaml.load(yaml_file, Loader=yaml.SafeLoader)
+    yaml_file.close()
+
     subprocess.call(["./main", "-t 10"])
     quantiles = showresults.postprocess()
 
     f.write(channel + ",")
     f.write(str(np.round(quantiles[0], 2)) + ",")
     f.write(str(np.round(quantiles[1], 2)) + ",")
-    f.write(str(np.round(quantiles[2], 2)) + "\n")
+    f.write(str(np.round(quantiles[2], 2)) + ",")
+
+    if data["t_end"] - data["t_start"] < 10732.0:
+        f.write("channel has existed for less than one month")
+    f.write("\n")
     f.flush()
 
 f.close()
