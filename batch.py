@@ -45,7 +45,7 @@ for channel in channels:
     f.write(str(np.round((data["t_end"] - data["t_start"])/17532.0, 2)) + ",")
 
     tot = 0.0
-    if len(data["amounts"]) > 0:
+    if data["amounts"] is not None and len(data["amounts"]) > 0:
         tot = np.sum(data["amounts"])
 
     f.write(str(np.round(tot, 2)) + ",")
