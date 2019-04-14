@@ -46,7 +46,8 @@ for channel in channels:
 
     tot = 0.0
     if data["amounts"] is not None and len(data["amounts"]) > 0:
-        tot = np.sum(data["amounts"])
+        for amount in data["amounts"]:
+            tot += float(amount) # Sometimes yaml thinks it's a string
 
     f.write(str(np.round(tot, 2)) + ",")
     f.write(str(np.round(quantiles[0], 2)) + ",")
