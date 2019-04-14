@@ -54,7 +54,7 @@ MyModel::MyModel()
 
 void MyModel::from_prior(DNest4::RNG& rng)
 {
-    lambda = exp(log(1E-4) + log(1E6)*rng.rand());
+    lambda = exp(log(1E-6) + log(1E6)*rng.rand());
     mu = exp(3.0*rng.randn());
     sigma = 0.3 + 4.7*rng.rand();
 }
@@ -69,7 +69,7 @@ double MyModel::perturb(DNest4::RNG& rng)
     {
         lambda = log(lambda);
         lambda += log(1E6)*rng.randh2();
-        DNest4::wrap(lambda, log(1E-4), log(1E2));
+        DNest4::wrap(lambda, log(1E-6), log(1.0));
         lambda = exp(lambda);
     }
     else if(which == 1)
