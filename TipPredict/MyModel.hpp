@@ -135,13 +135,16 @@ double MyModel::log_likelihood() const
     double C2 = -0.5*log(2.0*M_PI) - log(u*sigma);
     double tau2 = pow(u*sigma, -2);
     double log_mu = log(mu);
+    double log_wide_weight = log(wide_weight);
+    double log_narrow_weight = log(1.0 - wide_weight);
+
     double logL1, logL2;
 
     for(int i=0; i<Data::instance.get_num_tips(); ++i)
     {
-        logL1 = log(wide_weight) + C1 - log_amounts[i]
+        logL1 = log_wide_weight + C1 - log_amounts[i]
                         - 0.5*tau1*pow(log_amounts[i] - log_mu, 2);
-        logL2 = log(1.0 - wide_weight) + C2 - log_amounts[i]
+        logL2 = log_narrow_weight + C2 - log_amounts[i]
                         - 0.5*tau2*pow(log_amounts[i] - log_mu, 2);
         logL += DNest4::logsumexp(logL1, logL2);
     }
