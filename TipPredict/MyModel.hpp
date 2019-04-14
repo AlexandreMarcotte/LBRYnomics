@@ -1,6 +1,7 @@
 #ifndef TipPredict_MyModel_hpp
 #define TipPredict_MyModel_hpp
 
+#include "DNest4/code/Distributions/Cauchy.h"
 #include "Data.hpp"
 #include <iomanip>
 #include <ostream>
@@ -20,6 +21,7 @@ class MyModel
 
         // Constant poisson process rate
         double lambda;
+        DNest4::TruncatedCauchy cauchy; // Used for the prior for lambda
 
         // Parameters for mixture-of-lognormal tip sizes
         double mu, sigma; // Location of both, scale of wide
@@ -49,13 +51,14 @@ class MyModel
 DNest4::RNG MyModel::junk_rng(0);
 
 MyModel::MyModel()
+:cauchy(-4.0, 1.0, -6.0, 0.0)
 {
 
 }
 
 void MyModel::from_prior(DNest4::RNG& rng)
 {
-    lambda = exp(log(1E-6) + log(1E6)*rng.rand());
+    lambda = pow(10.0, cauchy.generate(rng));
     mu = exp(3.0*rng.randn());
     sigma = 0.3 + 4.7*rng.rand();
     u = 0.05 + 0.95*rng.rand();
@@ -70,10 +73,9 @@ double MyModel::perturb(DNest4::RNG& rng)
 
     if(which == 0)
     {
-        lambda = log(lambda);
-        lambda += log(1E6)*rng.randh2();
-        DNest4::wrap(lambda, log(1E-6), log(1.0));
-        lambda = exp(lambda);
+        lambda = log10(lambda);
+        logH += cauchy.perturb(lambda, rng);
+        lambda = pow(10.0, lambda);
     }
     else if(which == 1)
     {
