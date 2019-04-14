@@ -21,8 +21,9 @@ class MyModel
         // Constant poisson process rate
         double lambda;
 
-        // Parameters for lognormal tip size
-        double mu, sigma;
+        // Parameters for mixture-of-lognormal tip sizes
+        double mu, sigma; // Location of both, scale of wide
+        double u, wide_weight;
 
         // Get instantaneous poisson rate
         double instantaneous_rate(double t) const;
@@ -54,22 +55,24 @@ MyModel::MyModel()
 
 void MyModel::from_prior(DNest4::RNG& rng)
 {
-    lambda = exp(log(1E-4) + log(1E6)*rng.rand());
+    lambda = exp(log(1E-6) + log(1E6)*rng.rand());
     mu = exp(3.0*rng.randn());
     sigma = 0.3 + 4.7*rng.rand();
+    u = 0.05 + 0.95*rng.rand();
+    wide_weight = rng.rand();
 }
 
 double MyModel::perturb(DNest4::RNG& rng)
 {
     double logH = 0.0;
 
-    int which = rng.rand_int(3);
+    int which = rng.rand_int(5);
 
     if(which == 0)
     {
         lambda = log(lambda);
         lambda += log(1E6)*rng.randh2();
-        DNest4::wrap(lambda, log(1E-4), log(1E2));
+        DNest4::wrap(lambda, log(1E-6), log(1.0));
         lambda = exp(lambda);
     }
     else if(which == 1)
@@ -80,10 +83,20 @@ double MyModel::perturb(DNest4::RNG& rng)
         logH += -0.5*pow(mu/3.0, 2);
         mu = exp(mu);
     }
-    else
+    else if(which == 2)
     {
         sigma += 4.7*rng.randh2();
         DNest4::wrap(sigma, 0.3, 5.0);
+    }
+    else if(which == 3)
+    {
+        u += 0.95*rng.randh();
+        DNest4::wrap(u, 0.05, 1.0);
+    }
+    else
+    {
+        wide_weight += rng.randh();
+        DNest4::wrap(wide_weight, 0.0, 1.0);
     }
 
     return logH;
@@ -116,13 +129,21 @@ double MyModel::log_likelihood() const
                                 Data::instance.get_t_end());
 
     // Now do the tip amounts
-    double C = -0.5*log(2.0*M_PI) - log(sigma);
-    double tau = pow(sigma, -2);
+    // 1 = wide, 2 = narrow
+    double C1 = -0.5*log(2.0*M_PI) - log(sigma);
+    double tau1 = pow(sigma, -2);
+    double C2 = -0.5*log(2.0*M_PI) - log(u*sigma);
+    double tau2 = pow(u*sigma, -2);
     double log_mu = log(mu);
+    double logL1, logL2;
+
     for(int i=0; i<Data::instance.get_num_tips(); ++i)
     {
-        logL += C - log_amounts[i]
-                        - 0.5*tau*pow(log_amounts[i] - log_mu, 2);
+        logL1 = log(wide_weight) + C1 - log_amounts[i]
+                        - 0.5*tau1*pow(log_amounts[i] - log_mu, 2);
+        logL2 = log(1.0 - wide_weight) + C2 - log_amounts[i]
+                        - 0.5*tau2*pow(log_amounts[i] - log_mu, 2);
+        logL += DNest4::logsumexp(logL1, logL2);
     }
 
     return logL;
@@ -143,6 +164,7 @@ void MyModel::print(std::ostream& out) const
 {
     out << std::setprecision(16);
     out << lambda << ' ' << mu << ' ' << sigma << ' ';
+    out << u << ' ' << wide_weight << ' ';
 
     // Forecast total tips over next month
     static constexpr double prediction_interval = 17532.0;
@@ -165,7 +187,11 @@ void MyModel::print(std::ostream& out) const
         t = t - log(1.0 - junk_rng.rand())/lambda;
         if(t > Data::instance.get_t_end() + prediction_interval)
             break;
-        forecast += mu*exp(sigma*junk_rng.randn());
+
+        double s = (junk_rng.rand() <= wide_weight)?
+                   (sigma):(u*sigma);
+
+        forecast += mu*exp(s*junk_rng.randn());
     }
 
     out << forecast;
@@ -173,7 +199,7 @@ void MyModel::print(std::ostream& out) const
 
 std::string MyModel::description() const
 {
-    return "lambda, mu, sigma, forecast";
+    return "lambda, mu, sigma, u, wide_weight, forecast";
 }
 
 } // namespace
