@@ -16,27 +16,50 @@ channels = sorted(["@Lunduke", "@NaomiBrockwell", "@TheLinuxGamer",
                    "@reenthused", "@CatholicHomilies", "@NameThatTune",
                    "@txgarage", "@TipWhatYouLike", "@MusicPlanet",
                    "@3Blue1Brown", "@altcoinbuzz", "@BrendonBrewer",
-                   "@anton", "@ModerateConservative", "@LBRY-Social",
+                   "@anton#1c10545675c9d25749fc12f6e872777da257dd51",
+                   "@ModerateConservative", "@LBRY-Social",
                    "@zO-Music", "@KhanAcademy", "@Michaelcraigheadart",
-                   "@postjazzrdg", "@kcSebOfficial", "@KJamesElliott",
+                   "@postjazzrdg", "@kcSebOfficial",
                    "@DanielSibisan", "@jeradhill", "@JuliaGalef",
-                   "@KhanAcademy", "@NorVegan", "@VeganGains"],
+                   "@NorVegan", "@VeganGains",
+                   "@KJamesElliott#36aab723dc34a5e5d4173436f01c7c3457493201",
+                   "@veritasium", "@radiodrama", "@inspirationart",
+                   "@Archaeosoup",
+                   "@ronnietucker#2b01f813801407ba1f6ece40ddf94db9ffb04481"],
                     key=lambda s: s.lower())
 
 f = open("forecasts.csv", "w")
-f.write("channel_name,forecast_low,forecast_medium,forecast_high\n")
+f.write("channel_name,months_active,total_tips_received,forecast_low,forecast_medium,forecast_high,notes\n")
 f.flush()
 
 for channel in channels:
     data = fetch_data.get_data(channel)
     fetch_data.write_flattened(data)
+
+    import yaml
+    yaml_file = open("data.yaml")
+    data = yaml.load(yaml_file, Loader=yaml.SafeLoader)
+    yaml_file.close()
+
     subprocess.call(["./main", "-t 10"])
     quantiles = showresults.postprocess()
 
     f.write(channel + ",")
+    f.write(str(np.round((data["t_end"] - data["t_start"])/17532.0, 2)) + ",")
+
+    tot = 0.0
+    if data["amounts"] is not None and len(data["amounts"]) > 0:
+        for amount in data["amounts"]:
+            tot += float(amount) # Sometimes yaml thinks it's a string
+
+    f.write(str(np.round(tot, 2)) + ",")
     f.write(str(np.round(quantiles[0], 2)) + ",")
     f.write(str(np.round(quantiles[1], 2)) + ",")
-    f.write(str(np.round(quantiles[2], 2)) + "\n")
+    f.write(str(np.round(quantiles[2], 2)) + ",")
+
+    if data["t_end"] - data["t_start"] < 17532.0:
+        f.write("channel has existed for less than one month")
+    f.write("\n")
     f.flush()
 
 f.close()

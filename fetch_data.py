@@ -34,6 +34,10 @@ def get_data(channel_name, page_size=100):
         # Go where the important stuff is
         claims = result[0][channel_name]["claims_in_channel"]
 
+        # This is really bad
+        if type(claims) == int:
+            claims = []
+
         for claim in claims:
 
             # Get the block height of the transaction
@@ -136,6 +140,6 @@ def write_flattened(data, filename="data.yaml"):
 
 
 if __name__ == "__main__":
-    data = get_data("@TheCryptoLark")
+    data = get_data("@VeganGains")
     write_flattened(data)
 

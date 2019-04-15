@@ -1,6 +1,7 @@
 #ifndef TipPredict_MyModel_hpp
 #define TipPredict_MyModel_hpp
 
+#include "DNest4/code/Distributions/Cauchy.h"
 #include "Data.hpp"
 #include <iomanip>
 #include <ostream>
@@ -20,17 +21,19 @@ class MyModel
 
         // Constant poisson process rate
         double lambda;
+        DNest4::TruncatedCauchy cauchy; // Used for the prior for lambda
 
         // Pulses - amplitude hyperparameter in units of lambda
-        double pulse_height;
+        double pulse_rel_amplitude;
 
         // Latent N(0, 1) coordinates and the pulse amplitudes
         std::vector<double> ns;
         std::vector<double> As;
         void compute_As();
 
-        // Parameters for lognormal tip size
-        double mu, sigma;
+        // Parameters for mixture-of-lognormal tip sizes
+        double mu, sigma; // Location of both, scale of wide
+        double u, wide_weight;
 
         // Get instantaneous poisson rate
         double instantaneous_rate(double t) const;
@@ -58,6 +61,7 @@ DNest4::RNG MyModel::junk_rng(0);
 MyModel::MyModel()
 :ns(Data::instance.get_claim_times().size())
 ,As(Data::instance.get_claim_times().size())
+,cauchy(-4.0, 1.0, -6.0, 0.0)
 {
 
 }
@@ -65,45 +69,46 @@ MyModel::MyModel()
 void MyModel::compute_As()
 {
     for(size_t i=0; i<ns.size(); ++i)
-        As[i] = pulse_height*lambda*exp(ns[i]);
+        As[i] = pulse_rel_amplitude*lambda*exp(ns[i]);
 }
 
 void MyModel::from_prior(DNest4::RNG& rng)
 {
     lambda = exp(log(1E-4) + log(1E6)*rng.rand());
-    pulse_height = exp(3.0*rng.randn());
+    pulse_rel_amplitude = exp(3.0*rng.randn());
     for(size_t i=0; i<ns.size(); ++i)
         ns[i] = rng.randn();
     compute_As();
 
-    mu = exp(rng.randn());
-    sigma = 0.05 + 4.95*rng.rand();
+    mu = exp(3.0*rng.randn());
+    sigma = 0.3 + 4.7*rng.rand();
+    u = 0.05 + 0.95*rng.rand();
+    wide_weight = rng.rand();
 }
 
 double MyModel::perturb(DNest4::RNG& rng)
 {
     double logH = 0.0;
 
-    int which = rng.rand_int(6);
+    int which = rng.rand_int(7);
 
     if(which == 0)
     {
-        lambda = log(lambda);
-        lambda += log(1E6)*rng.randh2();
-        DNest4::wrap(lambda, log(1E-4), log(1E2));
-        lambda = exp(lambda);
+        lambda = log10(lambda);
+        logH += cauchy.perturb(lambda, rng);
+        lambda = pow(10.0, lambda);
     }
-    else if(which == 2)
+    else if(which == 1)
     {
-        pulse_height = log(pulse_height);
-        logH -= -0.5*pow(pulse_height/3.0, 2);
-        pulse_height += 3.0*rng.randh();
-        logH += -0.5*pow(pulse_height/3.0, 2);
-        pulse_height = exp(pulse_height);
+        pulse_rel_amplitude = log(pulse_rel_amplitude);
+        logH -= -0.5*pow(pulse_rel_amplitude/3.0, 2);
+        pulse_rel_amplitude += 3.0*rng.randh();
+        logH += -0.5*pow(pulse_rel_amplitude/3.0, 2);
+        pulse_rel_amplitude = exp(pulse_rel_amplitude);
 
         compute_As();
     }
-    else if(which == 3)
+    else if(which == 2)
     {
         int k = rng.rand_int(ns.size());
 
@@ -114,18 +119,28 @@ double MyModel::perturb(DNest4::RNG& rng)
         // This could be made more efficient by only doing element k
         compute_As();
     }
-    else if(which == 4)
+    else if(which == 3)
     {
         mu = log(mu);
-        logH -= -0.5*pow(mu, 2);
-        mu += rng.randh2();
-        logH += -0.5*pow(mu, 2);
+        logH -= -0.5*pow(mu/3.0, 2);
+        mu += 3.0*rng.randh2();
+        logH += -0.5*pow(mu/3.0, 2);
         mu = exp(mu);
+    }
+    else if(which == 4)
+    {
+        sigma += 4.7*rng.randh2();
+        DNest4::wrap(sigma, 0.3, 5.0);
+    }
+    else if(which == 5)
+    {
+        u += 0.95*rng.randh();
+        DNest4::wrap(u, 0.05, 1.0);
     }
     else
     {
-        sigma += 4.95*rng.randh2();
-        DNest4::wrap(sigma, 0.05, 5.0);
+        wide_weight += rng.randh();
+        DNest4::wrap(wide_weight, 0.0, 1.0);
     }
 
     return logH;
@@ -158,13 +173,24 @@ double MyModel::log_likelihood() const
                                 Data::instance.get_t_end());
 
     // Now do the tip amounts
-    double C = -0.5*log(2.0*M_PI) - log(sigma);
-    double tau = pow(sigma, -2);
+    // 1 = wide, 2 = narrow
+    double C1 = -0.5*log(2.0*M_PI) - log(sigma);
+    double tau1 = pow(sigma, -2);
+    double C2 = -0.5*log(2.0*M_PI) - log(u*sigma);
+    double tau2 = pow(u*sigma, -2);
     double log_mu = log(mu);
+    double log_wide_weight = log(wide_weight);
+    double log_narrow_weight = log(1.0 - wide_weight);
+
+    double logL1, logL2;
+
     for(int i=0; i<Data::instance.get_num_tips(); ++i)
     {
-        logL += C - log_amounts[i]
-                        - 0.5*tau*pow(log_amounts[i] - log_mu, 2);
+        logL1 = log_wide_weight + C1 - log_amounts[i]
+                        - 0.5*tau1*pow(log_amounts[i] - log_mu, 2);
+        logL2 = log_narrow_weight + C2 - log_amounts[i]
+                        - 0.5*tau2*pow(log_amounts[i] - log_mu, 2);
+        logL += DNest4::logsumexp(logL1, logL2);
     }
 
     return logL;
@@ -184,7 +210,8 @@ double MyModel::integrate_rate(double t0, double t1) const
 void MyModel::print(std::ostream& out) const
 {
     out << std::setprecision(16);
-    out << lambda << ' ' << pulse_height << ' ' << mu << ' ' << sigma << ' ';
+    out << lambda << ' ' << pulse_rel_amplitude << ' ' << mu << ' ' << sigma << ' ';
+    out << u << ' ' << wide_weight << ' ';
 
     // Forecast total tips over next month
     static constexpr double prediction_interval = 17532.0;
@@ -207,7 +234,11 @@ void MyModel::print(std::ostream& out) const
         t = t - log(1.0 - junk_rng.rand())/lambda;
         if(t > Data::instance.get_t_end() + prediction_interval)
             break;
-        forecast += mu*exp(sigma*junk_rng.randn());
+
+        double s = (junk_rng.rand() <= wide_weight)?
+                   (sigma):(u*sigma);
+
+        forecast += mu*exp(s*junk_rng.randn());
     }
 
     out << forecast;
@@ -215,7 +246,7 @@ void MyModel::print(std::ostream& out) const
 
 std::string MyModel::description() const
 {
-    return "lambda, mu, sigma, forecast";
+    return "lambda, mu, sigma, u, wide_weight, forecast";
 }
 
 } // namespace

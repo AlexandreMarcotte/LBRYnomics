@@ -1,12 +1,14 @@
 TipPredict
 ==========
 
-Bayesian extrapolation of LBRY tips. This is work in progress and you probably
+Bayesian extrapolation of [LBRY](https://api.lbry.io/user/refer?r=9pa98r9uUUFgJ4JpVr1YvH5dMEbXNTvo) tips*. This is work in progress and you probably
 shouldn't try to use it yet unless you're me. I am, however, publishing the
 output from it at `lbry://@BrendonBrewer/forecasts`, and I should be updating
 that quite regularly.
 
 (c) 2019 Brendon J. Brewer. LICENCE: MIT.
+
+\* Full disclosure: That's a referral link and I'll get a little reward if you install the program.
 
 Dependencies:
 
