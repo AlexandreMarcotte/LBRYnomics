@@ -24,7 +24,8 @@ channels = sorted(["@Lunduke", "@NaomiBrockwell", "@TheLinuxGamer",
                    "@NorVegan", "@VeganGains",
                    "@KJamesElliott#36aab723dc34a5e5d4173436f01c7c3457493201",
                    "@veritasium", "@radiodrama", "@inspirationart",
-                   "@Archaeosoup",
+                   "@Archaeosoup", "@eevblog",
+                   "@adrianbonillap#2f10475ee7090d2030ee2dd17eb4b39bc9437970",
                    "@ronnietucker#2b01f813801407ba1f6ece40ddf94db9ffb04481"],
                     key=lambda s: s.lower())
 
