@@ -21,7 +21,7 @@ channels = sorted(["@Lunduke", "@NaomiBrockwell", "@TheLinuxGamer",
                    "@zO-Music", "@KhanAcademy", "@Michaelcraigheadart",
                    "@postjazzrdg", "@kcSebOfficial",
                    "@DanielSibisan", "@jeradhill", "@JuliaGalef",
-                   "@NorVegan", "@VeganGains", "@UCBerkeley"
+                   "@NorVegan", "@VeganGains", "@UCBerkeley",
                    "@KJamesElliott#36aab723dc34a5e5d4173436f01c7c3457493201",
                    "@veritasium", "@radiodrama", "@inspirationart",
                    "@Archaeosoup", "@eevblog", "@cleverly", "@FEEOrg",
