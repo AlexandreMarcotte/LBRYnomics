@@ -101,7 +101,7 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
     # Now, put a link to the data in data.yaml
     f = open("data.yaml", "w")
     f.write("# Just a pointer to the dataset to be loaded by main\n---\n")
-    f.write("src: " + filename + "\n")
+    f.write("src: \"" + filename + "\"\n")
     f.close()
 
     print("Output written to {file}.".format(file=filename))
