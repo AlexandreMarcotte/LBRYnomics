@@ -1,4 +1,6 @@
-DISCLAIMER: This information is provided for entertainment purposes only. For instance, prior to 2019-04-10, there was a very dumb bug which made the numbers all wrong. Hey, at least *that* bug is gone now. NOTE: If a channel owner routinely withdraws their tips, the numbers here will not reflect those tips!
+DISCLAIMER: This information is provided for entertainment purposes only.
+
+NOTE: Since 2019-04-20, when I switched to using chainquery to fetch the data, the results now include withdrawn tips.
 
 I used [TipPredict](https://github.com/eggplantbren/TipPredict) to forecast LBC tips received over the next month for some publishers on LBRY. This is a CSV file containing a low, a medium, and a high prediction for each of the creators on the list. I made quite basic "status quo" assumptions, which assume that the next month is quite likely to look similar to previous months apart from typical statistical fluctuations.
 If people find this service useful, I can make the assumptions much more realistic and sophisticated, including things like trends,
