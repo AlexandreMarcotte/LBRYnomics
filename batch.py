@@ -45,7 +45,7 @@ for channel in channels:
     quantiles = showresults.postprocess()
 
     f.write(channel + ",")
-    f.write(str(np.round((data["t_end"] - data["t_start"])/17532.0, 2)) + ",")
+    f.write(str(np.round(data["t_end"] - data["t_start"], 2)) + ",")
 
     tot = 0.0
     if data["amounts"] is not None and len(data["amounts"]) > 0:
@@ -57,7 +57,7 @@ for channel in channels:
     f.write(str(np.round(quantiles[1], 2)) + ",")
     f.write(str(np.round(quantiles[2], 2)) + ",")
 
-    if data["t_end"] - data["t_start"] < 17532.0:
+    if data["t_end"] - data["t_start"] < 1.0:
         f.write("channel has existed for less than one month")
     f.write("\n")
     f.flush()
