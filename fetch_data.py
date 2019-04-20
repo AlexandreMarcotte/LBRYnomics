@@ -17,7 +17,8 @@ lbry = ira.lbryRPC()
 def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
     """
     Fetch all the tips at channel_name and write their data to
-    data.yaml. Time units are months. Optionally, plot the tip history.
+    Data/channel_name.yaml.
+    Time units are months. Optionally, plot the tip history.
     """
 
     # Get the channel's claim_id by doing a lbrynet resolve
@@ -68,14 +69,22 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
     t_start = claim_times.min()
     t_end = time.time()
 
+    # Remove any tips that predate first claim
+    bad = times <= t_start
+    times = times[~bad]
+    amounts = amounts[~bad]
+    num_bad = bad.sum()
+    if num_bad > 0:
+        print("Removed {b} tips from before first claim.".format(b=num_bad))
 
     # Convert all times to months
     t_start /= 2629800.0
     t_end /= 2629800.0
     times /= 2629800.0
 
-    # Save to data.yaml
-    f = open("data.yaml", "w")
+    # Save to a YAML file
+    filename = "Data/" + channel_name + ".yaml"
+    f = open(filename, "w")
     f.write("---\n")
     f.write("t_start: " + str(t_start) + "\n")
     f.write("t_end: "   + str(t_end) + "\n")
@@ -88,7 +97,14 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
         f.write("    - " + str(amount) + "\n")
 
     f.close()
-    print("Output written to data.yaml.")
+
+    # Now, put a link to the data in data.yaml
+    f = open("data.yaml", "w")
+    f.write("# Just a pointer to the dataset to be loaded by main\n---\n")
+    f.write("src: " + filename + "\n")
+    f.close()
+
+    print("Output written to {file}.".format(file=filename))
 
 
     if plot:

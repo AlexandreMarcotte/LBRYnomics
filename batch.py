@@ -32,6 +32,7 @@ channels = sorted(["@Lunduke", "@NaomiBrockwell", "@TheLinuxGamer",
                    "@Books"],
                     key=lambda s: s.lower())
 
+# Open output CSV file
 f = open("forecasts.csv", "w")
 f.write("channel_name,months_active,total_tips_received,forecast_low,forecast_medium,forecast_high,notes\n")
 f.flush()
@@ -40,6 +41,10 @@ for channel in channels:
     fetch_data.data_to_yaml(channel)
 
     yaml_file = open("data.yaml")
+    data = yaml.load(yaml_file, Loader=yaml.SafeLoader)
+    src = data["src"]
+    yaml_file.close()
+    yaml_file = open(src)
     data = yaml.load(yaml_file, Loader=yaml.SafeLoader)
     yaml_file.close()
 
