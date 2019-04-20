@@ -4,7 +4,6 @@ I'm after.
 """
 
 import ira
-import matplotlib.pyplot as plt
 import numpy as np
 import numpy.random as rng
 import requests
@@ -94,17 +93,24 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
 
     if plot:
         # Plot the tips
-        plt.figure()
+        import matplotlib.pyplot as plt
+
+        plt.rcParams["font.family"] = "serif"
+        plt.rcParams["font.size"] = 12
+        plt.rc("text", usetex=True)
+
+        plt.figure(figsize=(10, 5))
         for i in range(len(amounts)):
-            plt.plot([times[i], times[i]], [0.0, amounts[i]], "b-")
+            plt.plot([times[i], times[i]], [0.0, amounts[i]], "b-", alpha=0.5)
         plt.ylim(bottom=0.0)
         plt.xlim(t_start, t_end)
-        plt.xlabel("Time (unix time, months)")
-        plt.ylabel("Tip amount (LBC)")
+        plt.xlabel("Time (unix time, months)", fontsize=12)
+        plt.ylabel("Tip amount (LBC)", fontsize=12)
+        plt.title("Tip history for " + channel_name, fontsize=14)
         plt.show()
 
 
 if __name__ == "__main__":
-    data_to_yaml("@veritasium", plot=True)
+    data_to_yaml("@Lunduke", plot=True)
 
 
