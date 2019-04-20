@@ -111,6 +111,11 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
 
 
 if __name__ == "__main__":
-    data_to_yaml("@Lunduke", plot=True)
+    import sys
 
+    channel = "@Lunduke" # A default channel
+    if len(sys.argv) >= 2:
+        channel = sys.argv[1]
+
+    data_to_yaml(channel, plot=True)
 
