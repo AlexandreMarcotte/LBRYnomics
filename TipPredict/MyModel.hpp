@@ -51,7 +51,7 @@ class MyModel
 DNest4::RNG MyModel::junk_rng(0);
 
 MyModel::MyModel()
-:cauchy(-4.0, 1.0, -6.0, 0.0)
+:cauchy(0.0, 1.0, -5.0, 5.0)
 {
 
 }
@@ -172,7 +172,7 @@ void MyModel::print(std::ostream& out) const
     out << u << ' ' << wide_weight << ' ';
 
     // Forecast total tips over next month
-    static constexpr double prediction_interval = 17532.0;
+    static constexpr double prediction_interval = 1.0;
     double expected_num_tips = integrate_rate
                 (Data::instance.get_t_end(),
                  Data::instance.get_t_end() + prediction_interval);
