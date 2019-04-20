@@ -1,136 +1,110 @@
-from ira import *
+"""
+Trying to use chainquery instead of the daemon to get all the data
+I'm after.
+"""
+
+import ira
+import matplotlib.pyplot as plt
 import numpy as np
 import numpy.random as rng
+import requests
 import time
+import urllib.request
+import yaml
 
 # Initialise one of these things
-lbry = lbryRPC()
+lbry = ira.lbryRPC()
 
-# Get current block height
-current_time = lbry.lbry_call("status")[0]["wallet"]["blocks"]
-
-def get_data(channel_name, page_size=100):
+def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
     """
-    Get all the data from a given channel and return it in a nice
-    format (list of dicts).
+    Fetch all the tips at channel_name and write their data to
+    data.yaml. Time units are months. Optionally, plot the tip history.
     """
 
-    # Get number of claims and number of pages
-    result = lbry.claim_list_by_channel(channel_name, page=0)
+    # Get the channel's claim_id by doing a lbrynet resolve
 
-    try:
-        num_claims = result[0][channel_name]["claims_in_channel"]
-    except:
-        print("Channel " + channel_name + "failed.")
+    result = lbry.lbry_call("resolve", {"urls": [channel_name]})
+    channel_claim_id = result[0][channel_name]["certificate"]["claim_id"]
 
-    num_pages = 1 + num_claims // page_size
+    # The SQL query to perform
+    query = "SELECT support_amount amount, transaction.transaction_time time\
+             FROM\
+                 claim\
+                 INNER JOIN support\
+                 ON claim.claim_id = support.supported_claim_id\
+                 INNER JOIN transaction\
+                 ON support.transaction_hash_id = transaction.hash\
+                 WHERE publisher_id = '" + channel_claim_id + "';"
 
-    # Loop over the claims, pack the required data into a list
-    data = []
-    for page in range(1, num_pages+1):
-        result = lbry.claim_list_by_channel(channel_name,
-                                            page=page, page_size=page_size)
+    # Get all claims from the channel
+    request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
+    the_dict = request.json()
 
-        # Go where the important stuff is
-        claims = result[0][channel_name]["claims_in_channel"]
+    # Test for success
+    #if the_dict["success"]:
 
-        # This is really bad
-        if type(claims) == int:
-            claims = []
+    amounts = np.empty(len(the_dict["data"]))
+    times   = np.empty(len(the_dict["data"]))
+    for i in range(len(times)):
+        amounts[i] = float(the_dict["data"][i]["amount"])
+        times[i]   = float(the_dict["data"][i]["time"]) + rng.rand()
 
-        for claim in claims:
+    # Put amounts and times in time order
+    indices = np.argsort(times)
+    amounts = amounts[indices]
+    times = times[indices]
 
-            # Get the block height of the transaction
-            height = claim["height"]
+    # Get beginning time
+    # The SQL query to perform
+    query = "SELECT transaction_time FROM claim\
+                 WHERE publisher_id = '" + channel_claim_id + "';"
 
-            # Get the supports
-            supports = claim["supports"]
+    # Get all claims from the channel (used for t_start)
+    request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
+    the_list = request.json()["data"]
 
-            # Get the heights and amounts of the supports
-            this_claim_data = {}
-            support_heights = []
-            support_amounts = []
-
-            print("Processing tips from claim", end="", flush=True)
-
-            for support in supports:
-
-                while True:
-                    try:
-                        support_tx = lbry.lbry_call("transaction_show",
-                                                {"txid": support["txid"]})
-                        support_heights.append(support_tx[0]["height"])
-                        support_amounts.append(float(support["amount"]))
-                        print(".", end="", flush=True)
-                        break
-                    except:
-                        time.sleep(1.0)
-
-            this_claim_data["claim_height"] = height
-            this_claim_data["support_heights"] = support_heights
-            this_claim_data["support_amounts"] = support_amounts
-            this_claim_data["num_supports"] = len(support_heights)
-
-            data.append(this_claim_data)
-            print(".\nProcessed claim {num}.".format(num=len(data)))
-            print(this_claim_data)
-            print("\n", flush=True)
-
-    return data
+    claim_times = np.empty(len(the_list))
+    for i in range(len(the_list)):
+        claim_times[i] = float(the_list[i]["transaction_time"]) + rng.rand()
+    t_start = claim_times.min()
+    t_end = time.time()
 
 
-def write_flattened(data, filename="data.yaml"):
-    """
-    Input: a data list as output by get_data().
-    Output: a YAML dataset in the current format.
-    """
-    # Extract times of claims, to get a start and time
-    # (violating model assumptions slightly - end time should be current block
-    # height, model should be modified so start time is first claim)
-    claim_times = []
-    for claim in data:
-        claim_times.append(claim["claim_height"] + rng.rand())
-    t_start = np.min(claim_times)
+    # Convert all times to months
+    t_start /= 2629800.0
+    t_end /= 2629800.0
+    times /= 2629800.0
 
-    # Get tip times and amounts
-    times = []
-    amounts = []
-    for claim in data:
-        times   = times + claim["support_heights"]
-        amounts = amounts + claim["support_amounts"]
-    times = np.array(times)
-    amounts = np.array(amounts)
-
-    # Remove any tip that's before the first claim
-    # or after the current time.
-    good = (times >= t_start) & (times < current_time)
-    times = times[good]
-    amounts = amounts[good]
-
-    # Put tips in forward time order
-    # TODO: Remove this stupid randomisation to break ties on times
-    # and fix the model properly to work in discrete time.
-    times = times + rng.rand(len(times))
-    times = np.sort(times)
-    amounts = amounts[::-1]
-
-    f = open(filename, "w")
+    # Save to data.yaml
+    f = open("data.yaml", "w")
     f.write("---\n")
     f.write("t_start: " + str(t_start) + "\n")
-    f.write("t_end: "   + str(current_time) + "\n")
+    f.write("t_end: "   + str(t_end) + "\n")
 
     f.write("times:\n")
-    for time in times:
-        f.write("    - " + str(time) + "\n")
+    for t in times:
+        f.write("    - " + str(t) + "\n")
     f.write("amounts:\n")
     for amount in amounts:
         f.write("    - " + str(amount) + "\n")
 
     f.close()
-    print("Output written to " + filename + ".")
+    print("Output written to data.yaml.")
+
+
+    if plot:
+        # Plot the tips
+        plt.figure()
+        for i in range(len(amounts)):
+            plt.plot([times[i], times[i]], [0.0, amounts[i]], "b-")
+        plt.ylim(bottom=0.0)
+        plt.xlim(t_start, t_end)
+        plt.xlabel("Time (unix time, months)")
+        plt.ylabel("Tip amount (LBC)")
+        plt.show()
 
 
 if __name__ == "__main__":
-    data = get_data("@VeganGains")
-    write_flattened(data)
+    data_to_yaml("@veritasium", plot=True)
+
 

@@ -2,6 +2,7 @@ import fetch_data
 import numpy as np
 import showresults
 import subprocess
+import yaml
 
 # List of channels to make forecasts for
 channels = sorted(["@Lunduke", "@NaomiBrockwell", "@TheLinuxGamer",
@@ -34,10 +35,8 @@ f.write("channel_name,months_active,total_tips_received,forecast_low,forecast_me
 f.flush()
 
 for channel in channels:
-    data = fetch_data.get_data(channel)
-    fetch_data.write_flattened(data)
+    fetch_data.data_to_yaml(channel)
 
-    import yaml
     yaml_file = open("data.yaml")
     data = yaml.load(yaml_file, Loader=yaml.SafeLoader)
     yaml_file.close()
