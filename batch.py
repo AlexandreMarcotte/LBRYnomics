@@ -67,8 +67,10 @@ for channel in channels:
     f.write(str(np.round(quantiles[2], 2)) + ",")
 
     tip_times = np.array(data["times"])
-    t_start = data["t_start"]
-    bad_tips = int(np.sum(tip_times < t_start))
+    bad_tips = 0
+    if len(tip_times) > 0:
+        t_start = data["t_start"]
+        bad_tips = int(np.sum(tip_times < t_start))
     f.write(str(bad_tips) + ",")
 
     if duration < 1.0:
