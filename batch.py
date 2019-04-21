@@ -34,7 +34,7 @@ channels = sorted(["@Lunduke", "@NaomiBrockwell", "@TheLinuxGamer",
 
 # Open output CSV file
 f = open("forecasts.csv", "w")
-f.write("channel_name,months_active,total_tips_received,historical_average,forecast_low,forecast_medium,forecast_high,bad_tips,notes\n")
+f.write("channel_name,months_active,total_tips_received,historical_average,forecast_low,forecast_medium,forecast_high,notes\n")
 f.flush()
 
 for channel in channels:
@@ -65,14 +65,6 @@ for channel in channels:
     f.write(str(np.round(quantiles[0], 2)) + ",")
     f.write(str(np.round(quantiles[1], 2)) + ",")
     f.write(str(np.round(quantiles[2], 2)) + ",")
-
-
-    bad_tips = 0
-    if data["times"] is not None and len(data["times"]) > 0:
-        tip_times = np.array(data["times"])
-        t_start = data["t_start"]
-        bad_tips = int(np.sum(tip_times < t_start))
-    f.write(str(bad_tips) + ",")
 
     if duration < 1.0:
         f.write("channel has existed for less than one month")
