@@ -2,7 +2,10 @@ DISCLAIMER: This information is provided for entertainment purposes only.
 
 NOTE: Since 2019-04-20, when I switched to using chainquery to fetch the data, the results now include withdrawn tips.
 
-I used [TipPredict](https://github.com/eggplantbren/TipPredict) to forecast LBC tips received over the next month for some publishers on LBRY. This is a CSV file containing a low, a medium, and a high prediction for each of the creators on the list. I made quite basic "status quo" assumptions, which assume that the next month is quite likely to look similar to previous months apart from typical statistical fluctuations.
+I used [TipPredict](https://github.com/eggplantbren/TipPredict) to forecast LBC tips received over the next month for some publishers on LBRY.
+The forecast period is always one month from the day this file is updated.
+
+This is a CSV file containing a low, a medium, and a high prediction for each of the creators on the list. I made quite basic "status quo" assumptions, which assume that the next month is quite likely to look similar to previous months apart from typical statistical fluctuations.
 If people find this service useful, I can make the assumptions much more realistic and sophisticated, including things like trends,
 spikes when you publish, and the fact that what's observed for other
 channels has some bearing on what you might predict for a particular
