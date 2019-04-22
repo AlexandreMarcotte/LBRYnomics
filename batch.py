@@ -25,7 +25,7 @@ channels = sorted(["@Lunduke", "@NaomiBrockwell", "@TheLinuxGamer",
                    "@NorVegan", "@VeganGains", "@UCBerkeley",
                    "@KJamesElliott#36aab723dc34a5e5d4173436f01c7c3457493201",
                    "@veritasium", "@radiodrama", "@inspirationart",
-                   "@Archaeosoup", "@eevblog", "@cleverly", "@FEEOrg",
+                   "@Archaeosoup", "@eevblog", "@FEEOrg",
                    "@adrianbonillap#2f10475ee7090d2030ee2dd17eb4b39bc9437970",
                    "@ronnietucker",
                    "@UCurU6GLM4ggcLtWWAOTzlYw", "@roshansuares",
@@ -34,7 +34,7 @@ channels = sorted(["@Lunduke", "@NaomiBrockwell", "@TheLinuxGamer",
 
 # Open output CSV file
 f = open("forecasts.csv", "w")
-f.write("channel_name,months_active,total_tips_received,historical_average,forecast_low,forecast_medium,forecast_high,notes\n")
+f.write("channel_name,months_since_first_tip,num_tips,lbc_received,lbc_per_month,forecast_low,forecast_medium,forecast_high,notes\n")
 f.flush()
 
 for channel in channels:
@@ -60,6 +60,7 @@ for channel in channels:
         for amount in data["amounts"]:
             tot += float(amount) # Sometimes yaml thinks it's a string
 
+    f.write(str(len(data["amounts"])) + ",")
     f.write(str(np.round(tot, 2)) + ",")
     f.write(str(np.round(tot/duration, 2)) + ",")
     f.write(str(np.round(quantiles[0], 2)) + ",")
