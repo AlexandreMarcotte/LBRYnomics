@@ -54,28 +54,22 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
     amounts = amounts[indices]
     times = times[indices]
 
-    # Get beginning time
-    # The SQL query to perform
-    query = "SELECT transaction_time FROM claim\
-                 WHERE publisher_id = '" + channel_claim_id + "';"
+#    # Get beginning time
+#    # The SQL query to perform
+#    query = "SELECT transaction_time FROM claim\
+#                 WHERE publisher_id = '" + channel_claim_id + "';"
 
-    # Get all claims from the channel (used for t_start)
-    request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
-    the_list = request.json()["data"]
+#    # Get all claims from the channel (used for t_start)
+#    request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
+#    the_list = request.json()["data"]
 
-    claim_times = np.empty(len(the_list))
-    for i in range(len(the_list)):
-        claim_times[i] = float(the_list[i]["transaction_time"]) + rng.rand()
-    t_start = claim_times.min()
+#    claim_times = np.empty(len(the_list))
+#    for i in range(len(the_list)):
+#        claim_times[i] = float(the_list[i]["transaction_time"]) + rng.rand()
+#    t_start = claim_times.min()
+
+    t_start = times.min()
     t_end = time.time()
-
-    # Remove any tips that predate first claim
-    bad = times <= t_start
-    times = times[~bad]
-    amounts = amounts[~bad]
-    num_bad = bad.sum()
-    if num_bad > 0:
-        print("Removed {b} tips from before first claim.".format(b=num_bad))
 
     # Convert all times to months
     t_start /= 2629800.0

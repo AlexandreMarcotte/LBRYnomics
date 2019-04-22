@@ -113,11 +113,12 @@ double MyModel::log_likelihood() const
     const auto& log_amounts = Data::instance.get_log_amounts();
 
     // Beginning of time to first tip
-    if(times.size() > 0)
-    {
-        logL += log(instantaneous_rate(times[0]))
-                    - integrate_rate(Data::instance.get_t_start(), times[0]);
-    }
+    // Defunct: we're starting from the first tip now
+//    if(times.size() > 0)
+//    {
+//        logL += log(instantaneous_rate(times[0]))
+//                    - integrate_rate(Data::instance.get_t_start(), times[0]);
+//    }
 
     // Inter-tip times
     for(int i=1; i<Data::instance.get_num_tips(); ++i)
