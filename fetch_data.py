@@ -113,7 +113,8 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
         for i in range(len(amounts)):
             plt.plot([times[i], times[i]], [0.0, amounts[i]], "b-", alpha=0.5)
         plt.ylim(bottom=0.0)
-        plt.xlim(t_start, t_end)
+        t_range = t_end - t_start
+        plt.xlim(t_start - 0.01*t_range, t_end + 0.01*t_range)
         plt.xlabel("Time (unix time, months)", fontsize=12)
         plt.ylabel("Tip amount (LBC)", fontsize=12)
         plt.title("Tip history for " + channel_name +\
