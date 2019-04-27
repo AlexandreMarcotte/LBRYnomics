@@ -68,6 +68,11 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
 #        claim_times[i] = float(the_list[i]["transaction_time"]) + rng.rand()
 #    t_start = claim_times.min()
 
+    # Remove anything from before a unix time of around 500 months -
+    # it's likely an
+    # unconfirmed tip, which has early time.
+    times = times[times >= 1E9]
+
     t_start = times.min()
     t_end = time.time()
 
