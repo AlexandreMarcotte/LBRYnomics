@@ -71,7 +71,9 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
     # Remove anything from before a unix time of around 500 months -
     # it's likely an
     # unconfirmed tip, which has early time.
-    times = times[times >= 1E9]
+    keep = times >= 1E9
+    times = times[keep]
+    amounts = amounts[keep]
 
     t_start = times.min()
     t_end = time.time()
