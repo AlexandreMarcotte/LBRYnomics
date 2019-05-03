@@ -37,6 +37,7 @@ def all_claim_times(plot=False):
         times[i] = the_dict["data"][i]["time"]
 
     if plot:
+        import matplotlib.pyplot as plt
         plt.plot(times/2629800.0, np.arange(len(times)))
         plt.xlabel("Unix Time (months)")
         plt.ylabel("Number of claims")
