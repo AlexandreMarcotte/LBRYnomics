@@ -44,6 +44,7 @@ def all_claim_times(plot=False):
         plt.plot(times/2629800.0, np.arange(len(times)))
         plt.xlabel("Unix Time (months)")
         plt.ylabel("Number of claims")
+        plt.ylim(bottom=-100)
         plt.show()
 
     return times
