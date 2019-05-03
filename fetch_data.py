@@ -36,6 +36,9 @@ def all_claim_times(plot=False):
     for i in range(len(times)):
         times[i] = the_dict["data"][i]["time"]
 
+    # Remove pending ones
+    times = times[times >= 1E9]
+
     if plot:
         import matplotlib.pyplot as plt
         plt.plot(times/2629800.0, np.arange(len(times)))
