@@ -14,6 +14,37 @@ import yaml
 # Initialise one of these things
 lbry = ira.lbryRPC()
 
+
+def all_claim_times(plot=False):
+    """
+    Get the timestamps of all claims and plot the cumulative number vs. time!
+    """
+
+    # The SQL query to perform
+    query = "SELECT transaction.transaction_time time\
+             FROM\
+                 claim\
+                 INNER JOIN transaction\
+                 ON claim.transaction_hash_id = transaction.hash\
+             ORDER BY time ASC;"
+
+    # Get all claims from the channel
+    request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
+    the_dict = request.json()
+
+    times = np.empty(len(the_dict["data"]))
+    for i in range(len(times)):
+        times[i] = the_dict["data"][i]["time"]
+
+    if plot:
+        plt.plot(times/2629800.0, np.arange(len(times)))
+        plt.xlabel("Unix Time (months)")
+        plt.ylabel("Number of claims")
+        plt.show()
+
+    return times
+
+
 def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
     """
     Fetch all the tips at channel_name and write their data to
