@@ -1,6 +1,9 @@
 DISCLAIMER: This information is provided for entertainment purposes only.
 
-NOTE: Since 2019-04-20, when I switched to using chainquery to fetch the data, the results now include withdrawn tips.
+NOTE: Tips have been very irregular lately and my forecasting assumptions assume they
+are likely to be regular, so the forecasts should be taken with a *large* grain of
+salt. However, they still might be of interest, along with the historical LBC
+numbers.
 
 I used [TipPredict](https://github.com/eggplantbren/TipPredict) to forecast LBC tips received over the next month for some publishers on LBRY.
 The forecast period is always one month from the day this file is updated.
