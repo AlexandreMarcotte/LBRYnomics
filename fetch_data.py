@@ -42,15 +42,39 @@ def all_claim_times(plot=False):
     if plot:
         import matplotlib.pyplot as plt
         plt.rcParams["font.family"] = "serif"
-        plt.rcParams["font.size"] = 16
+        plt.rcParams["font.size"] = 14
         plt.rc("text", usetex=True)
 
-        plt.figure(figsize=(9, 7))
-        plt.plot((times - times.min())/2629800.0,
+        plt.figure(figsize=(12, 9))
+        plt.subplot(2, 1, 1)
+        times_in_days = (times - times.min())/86400.0
+        plt.plot(times_in_days,
                     np.arange(len(times)), "k-", linewidth=2)
-        plt.xlabel("Time (months)")
+        plt.xlabel("Time (days)")
         plt.ylabel("Cumulative number of claims")
+        plt.xlim([0.0, times_in_days.max()])
         plt.ylim(bottom=-100)
+
+        plt.subplot(2, 1, 2)
+        # Integers
+        days = times_in_days.astype("int64")
+        bins = np.arange(0, np.max(days)+1)
+        counts = plt.hist(days, bins, alpha=0.5, label="Raw")[0]
+
+        # Compute 10-day moving average
+        moving_average = np.zeros(len(bins))
+        for i in range(len(bins)):
+            subset = counts[0:(i+1)]
+            if len(subset) >= 10:
+                subset = subset[-10:]
+            moving_average[i] = np.mean(subset)
+        plt.plot(bins, moving_average, "k", linewidth=2,
+                    label="10-day moving average")
+        plt.xlim([0.0, times_in_days.max()])
+        plt.xlabel("Time (days)")
+        plt.ylabel("New claims added each day")
+#        plt.gca().set_yscale("log")
+        plt.legend()
         plt.show()
 
     return times
