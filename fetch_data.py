@@ -41,9 +41,15 @@ def all_claim_times(plot=False):
 
     if plot:
         import matplotlib.pyplot as plt
-        plt.plot(times/2629800.0, np.arange(len(times)))
-        plt.xlabel("Unix Time (months)")
-        plt.ylabel("Number of claims")
+        plt.rcParams["font.family"] = "serif"
+        plt.rcParams["font.size"] = 16
+        plt.rc("text", usetex=True)
+
+        plt.figure(figsize=(9, 7))
+        plt.plot((times - times.min())/2629800.0,
+                    np.arange(len(times)), "k-", linewidth=2)
+        plt.xlabel("Time (months)")
+        plt.ylabel("Cumulative number of claims")
         plt.ylim(bottom=-100)
         plt.show()
 
@@ -170,9 +176,10 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
 if __name__ == "__main__":
     import sys
 
-    channel = "@Lunduke" # A default channel
     if len(sys.argv) >= 2:
         channel = sys.argv[1]
+        data_to_yaml(channel, plot=True)
+    else:
+        all_claim_times(plot=True)
 
-    data_to_yaml(channel, plot=True)
 
