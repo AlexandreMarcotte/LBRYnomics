@@ -3,6 +3,7 @@ Docs/*.aux
 Docs/*.log
 Docs/*.pdf
 __pycache__
+claims.svg
 data.yaml
 forecasts.csv
 main

@@ -45,15 +45,20 @@ def all_claim_times(plot=False):
         plt.rcParams["font.size"] = 14
         plt.rc("text", usetex=True)
 
-        plt.figure(figsize=(12, 9))
+        plt.figure(figsize=(12, 10))
+
         plt.subplot(2, 1, 1)
         times_in_days = (times - times.min())/86400.0
         plt.plot(times_in_days,
-                    np.arange(len(times)), "k-", linewidth=2)
+                    np.arange(len(times)), "k-", linewidth=1)
         plt.xlabel("Time (days)")
         plt.ylabel("Cumulative number of claims")
         plt.xlim([0.0, times_in_days.max()])
         plt.ylim(bottom=-100)
+        plt.gca().grid(True)
+        plt.gca().tick_params(labelright=True)
+
+
 
         plt.subplot(2, 1, 2)
         # Integers
@@ -71,13 +76,18 @@ def all_claim_times(plot=False):
                 subset = subset[-10:]
             moving_average[i] = np.mean(subset)
         plt.plot(bins[0:-1] + 0.5*bin_width, moving_average, "k-",
-                    label="10-day moving average")
+                    label="10-day moving average", linewidth=1)
 
         plt.xlim([0.0, times_in_days.max()])
         plt.xlabel("Time (days)")
         plt.ylabel("New claims added each day")
+        plt.gca().grid(True)
+        plt.gca().tick_params(labelright=True)
+
+        
 #        plt.gca().set_yscale("log")
         plt.legend()
+        plt.savefig("claims.svg", bbox_inches="tight")
         plt.show()
 
     return times
