@@ -58,18 +58,21 @@ def all_claim_times(plot=False):
         plt.subplot(2, 1, 2)
         # Integers
         days = times_in_days.astype("int64")
-        bins = np.arange(0, np.max(days)+1)
-        counts = plt.hist(days, bins, alpha=0.5, label="Raw")[0]
+        bin_width = 1.0
+        bins = np.arange(0, np.max(days)+1) - 0.5*bin_width # Bin edges including right edge of last bin
+        counts = plt.hist(days, bins, alpha=0.5, color="g", label="Raw",
+                            width=bin_width, align="mid")[0]
 
         # Compute 10-day moving average
-        moving_average = np.zeros(len(bins))
-        for i in range(len(bins)):
+        moving_average = np.zeros(len(bins)-1)
+        for i in range(len(moving_average)):
             subset = counts[0:(i+1)]
             if len(subset) >= 10:
                 subset = subset[-10:]
             moving_average[i] = np.mean(subset)
-        plt.plot(bins, moving_average, "k", linewidth=2,
+        plt.plot(bins[0:-1] + 0.5*bin_width, moving_average, "k-",
                     label="10-day moving average")
+
         plt.xlim([0.0, times_in_days.max()])
         plt.xlabel("Time (days)")
         plt.ylabel("New claims added each day")
