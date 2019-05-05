@@ -68,7 +68,7 @@ for channel in channels:
     f.write(str(np.round(quantiles[2], 2)) + ",")
 
     if duration < 1.0:
-        f.write("< 1 month history available, likely unreliable forecast")
+        f.write("less than one month of tip history")
     f.write("\n")
     f.flush()
 
