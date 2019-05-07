@@ -51,8 +51,8 @@ def all_claim_times(plot=False):
         times_in_days = (times - times.min())/86400.0
         plt.plot(times_in_days,
                     np.arange(len(times)), "k-", linewidth=1)
-        plt.xlabel("Time (days)")
         plt.ylabel("Cumulative number of claims")
+        plt.title("Total number of claims = {n}".format(n=len(times)))
         plt.xlim([0.0, times_in_days.max()])
         plt.ylim(bottom=-100)
         plt.gca().grid(True)
@@ -83,8 +83,6 @@ def all_claim_times(plot=False):
         plt.ylabel("New claims added each day")
         plt.gca().grid(True)
         plt.gca().tick_params(labelright=True)
-
-        
 #        plt.gca().set_yscale("log")
         plt.legend()
         plt.savefig("claims.svg", bbox_inches="tight")
