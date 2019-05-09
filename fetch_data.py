@@ -91,6 +91,7 @@ def all_claim_times(plot=False):
         plt.legend()
         plt.savefig("claims.svg", bbox_inches="tight")
         print("Figure saved to claims.svg.")
+        plt.show()
 
     return times
 
