@@ -32,9 +32,18 @@ channels = sorted(["@Lunduke", "@NaomiBrockwell", "@TheLinuxGamer",
                    "@Books", "@AlasLewisAndBarnes"],
                     key=lambda s: s.lower())
 
+import sys
+
+forecast = True
+if len(sys.argv) >= 2 and sys.argv[1] == "--no-forecast":
+    forecast = False
+
 # Open output CSV file
 f = open("forecasts.csv", "w")
-f.write("channel_name,months_since_first_tip,num_tips,lbc_received,lbc_per_month,forecast_low,forecast_medium,forecast_high,notes\n")
+if forecast:
+    f.write("channel_name,months_since_first_tip,num_tips,lbc_received,lbc_per_month,forecast_low,forecast_medium,forecast_high,notes\n")
+else:
+    f.write("channel_name,months_since_first_tip,num_tips,lbc_received,lbc_per_month\n")
 f.flush()
 
 for channel in channels:
@@ -48,8 +57,9 @@ for channel in channels:
     data = yaml.load(yaml_file, Loader=yaml.SafeLoader)
     yaml_file.close()
 
-    subprocess.call(["./main", "-t 10"])
-    quantiles = showresults.postprocess()
+    if forecast:
+        subprocess.call(["./main", "-t 10"])
+        quantiles = showresults.postprocess()
 
     f.write(channel + ",")
     duration = data["t_end"] - data["t_start"]
@@ -63,12 +73,14 @@ for channel in channels:
     f.write(str(len(data["amounts"])) + ",")
     f.write(str(np.round(tot, 2)) + ",")
     f.write(str(np.round(tot/duration, 2)) + ",")
-    f.write(str(np.round(quantiles[0], 2)) + ",")
-    f.write(str(np.round(quantiles[1], 2)) + ",")
-    f.write(str(np.round(quantiles[2], 2)) + ",")
 
-    if duration < 1.0:
-        f.write("less than one month of tip history")
+    if forecast:
+        f.write(str(np.round(quantiles[0], 2)) + ",")
+        f.write(str(np.round(quantiles[1], 2)) + ",")
+        f.write(str(np.round(quantiles[2], 2)) + ",")
+
+        if duration < 1.0:
+            f.write("less than one month of tip history")
     f.write("\n")
     f.flush()
 
