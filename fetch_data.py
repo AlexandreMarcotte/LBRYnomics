@@ -45,14 +45,14 @@ def all_claim_times(plot=False):
         plt.rcParams["font.size"] = 14
         plt.rc("text", usetex=True)
 
-        plt.figure(figsize=(12, 10))
+        plt.figure(figsize=(15, 10))
 
         plt.subplot(2, 1, 1)
         times_in_days = (times - times.min())/86400.0
         plt.plot(times_in_days,
                     np.arange(len(times)), "k-", linewidth=1.5)
         plt.ylabel("Cumulative number of claims")
-        plt.title("Total number of claims = {n}".format(n=len(times)))
+        plt.title("Total number of claims = {n}.".format(n=len(times)))
         plt.xlim([0.0, times_in_days.max()])
         plt.ylim(bottom=-100)
         plt.gca().grid(True)
@@ -81,13 +81,16 @@ def all_claim_times(plot=False):
         plt.xlim([0.0, times_in_days.max()])
         plt.xlabel("Time (days)")
         plt.ylabel("New claims added each day")
+        subset = counts[-30:]
+        plt.title("Recent rate (last 30 days) = {n} claims per day.".\
+                    format(n=int(subset.mean())))
         plt.gca().grid(True)
         plt.gca().tick_params(labelright=True)
 #        plt.gca().set_yticks([1.0, 10.0, 100.0, 1000.0, 10000.0])
 #        plt.gca().set_yticklabels(["1", "10", "100", "1000", "10000"])
         plt.legend()
         plt.savefig("claims.svg", bbox_inches="tight")
-        plt.show()
+        print("Figure saved to claims.svg.")
 
     return times
 
