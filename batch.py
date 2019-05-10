@@ -29,7 +29,7 @@ channels = sorted(["@Lunduke", "@NaomiBrockwell", "@TheLinuxGamer",
                    "@adrianbonillap#2f10475ee7090d2030ee2dd17eb4b39bc9437970",
                    "@ronnietucker", "@mru", "@txgarage",
                    "@UCurU6GLM4ggcLtWWAOTzlYw", "@roshansuares",
-                   "@Books", "@AlasLewisAndBarnes"],
+                   "@Books", "@AlasLewisAndBarnes", "@morningdewmedia"],
                     key=lambda s: s.lower())
 
 import sys
