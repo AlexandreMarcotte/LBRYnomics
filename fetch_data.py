@@ -95,6 +95,41 @@ def all_claim_times(plot=False):
 
     return times
 
+def view_counts(channel_name, auth_token):
+
+    # Get the channel's claim_id by doing a lbrynet resolve
+
+    result = lbry.lbry_call("resolve", {"urls": [channel_name]})
+    channel_claim_id = result[0][channel_name]["certificate"]["claim_id"]
+
+    # For channels
+    url = "https://api.lbry.com/subscription/sub_count?auth_token=" +\
+                auth_token + "&" +\
+                "claim_id=" + channel_claim_id
+    result = requests.get(url)
+    subscribers = result.json()["data"][0]
+
+    # Get claim_ids from inside channel
+    query = "SELECT claim_id FROM claim\
+                 WHERE publisher_id = '" + channel_claim_id + "';"
+    request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
+    the_dict = request.json()
+
+    view_counts = []
+    for i in range(len(the_dict["data"])):
+        claim_id = the_dict["data"][i]["claim_id"]
+        url = "https://api.lbry.com/file/view_count?auth_token=" + auth_token + \
+                    "&" +\
+                    "claim_id=" + claim_id
+        result = requests.get(url)
+        view_counts.append(result.json()["data"][0])
+        print("Claim {i} has {v} views.".format(i=i+1, v=view_counts[-1]),
+                flush=True)
+
+    return { "subscribers": subscribers,
+             "view_counts": view_counts,
+             "total_views": np.sum(view_counts) }
+
 
 def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
     """
