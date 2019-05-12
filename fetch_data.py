@@ -127,9 +127,9 @@ def view_counts(channel_name, auth_token):
                 n=len(the_dict["data"]), v=view_counts[-1]),
                 flush=True)
 
-    return { "subscribers": subscribers,
-             "view_counts": view_counts,
-             "total_views": np.sum(view_counts) }
+    return { "view_counts": view_counts,
+             "total_views": np.sum(view_counts),
+             "subscribers": subscribers }
 
 
 def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
