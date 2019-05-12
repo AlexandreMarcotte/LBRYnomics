@@ -123,7 +123,8 @@ def view_counts(channel_name, auth_token):
                     "claim_id=" + claim_id
         result = requests.get(url)
         view_counts.append(result.json()["data"][0])
-        print("Claim {i} has {v} views.".format(i=i+1, v=view_counts[-1]),
+        print("Claim {k}/{n} has {v} views.".format(k=i+1,
+                n=len(the_dict["data"]), v=view_counts[-1]),
                 flush=True)
 
     return { "subscribers": subscribers,
