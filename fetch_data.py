@@ -109,16 +109,20 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
     channel_claim_id = result[0][channel_name]["certificate"]["claim_id"]
 
     # The SQL query to perform
-    query = "SELECT support_amount amount, transaction.transaction_time time\
+    # to get support amounts and times from the channel content
+    # AND the channel itself. Note: currently would include non-tip
+    # supports, but there shouldn't be too much of that going on.
+    query = "SELECT support_amount amount, transaction.transaction_time time,\
+                                transaction.hash\
              FROM\
                  claim\
                  INNER JOIN support\
                  ON claim.claim_id = support.supported_claim_id\
                  INNER JOIN transaction\
                  ON support.transaction_hash_id = transaction.hash\
-                 WHERE publisher_id = '" + channel_claim_id + "';"
-
-    # Get all claims from the channel
+                 WHERE publisher_id = '" + channel_claim_id + "'\
+                    OR support.supported_claim_id = '" +\
+                    channel_claim_id + "';"
     request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
     the_dict = request.json()
 
