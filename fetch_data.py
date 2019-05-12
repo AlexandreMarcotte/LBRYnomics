@@ -110,8 +110,10 @@ def view_counts(channel_name, auth_token):
     subscribers = result.json()["data"][0]
 
     # Get claim_ids from inside channel
-    query = "SELECT claim_id FROM claim\
-                 WHERE publisher_id = '" + channel_claim_id + "';"
+    query = "SELECT claim_id, title FROM claim\
+                WHERE publisher_id = '" + channel_claim_id + "'\
+                AND valid_at_height <> 0\
+                ORDER BY transaction_time ASC;"
     request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
     the_dict = request.json()
 
@@ -123,7 +125,10 @@ def view_counts(channel_name, auth_token):
                     "claim_id=" + claim_id
         result = requests.get(url)
         view_counts.append(result.json()["data"][0])
-        print("Claim {k}/{n} has {v} views.".format(k=i+1,
+        message = "Claim {k}/{n} with title \""\
+                    + the_dict["data"][i]["title"]\
+                        + "\" has {v} views."
+        print(message.format(k=i+1,
                 n=len(the_dict["data"]), v=view_counts[-1]),
                 flush=True)
 
