@@ -7,7 +7,7 @@ import yaml
 # List of channels to make forecasts for
 channels = sorted(["@Lunduke", "@NaomiBrockwell", "@TheLinuxGamer",
                    "@TheCryptoLark", "@CryptoCandor", "@mikenayna",
-                   "@TechFox", "@GaminGHD", "@nickatnyte",
+                   "@TechFox", "@GaminGHD", "@nickatnyte", "@FreeTalkLive",
                    "@BlueDrake42", "@seadox", "@icecreamcat",
                    "@CrazyFoxMovies", "@Barnacules", "@copchronicles",
                    "@MinutePhysics", "@GamesGlitches", "@LBRYEsp",
