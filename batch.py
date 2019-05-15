@@ -8,7 +8,7 @@ import yaml
 channels = sorted(["@Lunduke", "@NaomiBrockwell", "@TheLinuxGamer",
                    "@TheCryptoLark", "@CryptoCandor", "@mikenayna",
                    "@TechFox", "@GaminGHD", "@nickatnyte", "@FreeTalkLive",
-                   "@BlueDrake42", "@seadox", "@icecreamcat",
+                   "@BlueDrake42", "@seadox", "@icecreamcat", "@TheSchiffReport",
                    "@CrazyFoxMovies", "@Barnacules", "@copchronicles",
                    "@MinutePhysics", "@GamesGlitches", "@LBRYEsp",
                    "@upside", "@OpenSourceGames", "@paulvanderklay",
