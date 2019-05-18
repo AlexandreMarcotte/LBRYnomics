@@ -126,7 +126,7 @@ def view_counts(channel_name, auth_token):
         result = requests.get(url)
 #        print(the_dict["data"][i])
 #        print("\n\n")
-        print(result.json())
+#        print(result.json())
 
         view_counts.append(result.json()["data"][0])
         message = "Claim {k}/{n} with title \""\
