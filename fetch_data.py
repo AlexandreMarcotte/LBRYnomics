@@ -79,7 +79,7 @@ def all_claim_times(plot=False):
                     label="10-day moving average", linewidth=1.5)
 #        plt.gca().set_yscale("log")
         plt.xlim([0.0, times_in_days.max()])
-        plt.xlabel("Time (days)")
+        plt.xlabel("Time (days since LBRY began)")
         plt.ylabel("New claims added each day")
         subset = counts[-30:]
         plt.title("Recent average rate (last 30 days) = {n} claims per day.".\
