@@ -165,9 +165,9 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
                  ON claim.claim_id = support.supported_claim_id\
                  INNER JOIN transaction\
                  ON support.transaction_hash_id = transaction.hash\
-                 WHERE publisher_id = '" + channel_claim_id + "'\
-                    OR support.supported_claim_id = '" +\
-                    channel_claim_id + "';"
+                 WHERE publisher_id = '" + channel_claim_id + "';"# \
+#                    OR support.supported_claim_id = '" +\
+#                    channel_claim_id + "';"
     request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
     the_dict = request.json()
 
