@@ -95,7 +95,7 @@ def all_claim_times(plot=False):
 
     return times
 
-def view_counts(channel_name, auth_token):
+def view_counts(channel_name, auth_token, include_abandoned=False):
 
     # Get the channel's claim_id by doing a lbrynet resolve
 
@@ -111,9 +111,12 @@ def view_counts(channel_name, auth_token):
 
     # Get claim_ids from inside channel
     query = "SELECT name, claim_id, bid_state, valid_at_height, title FROM claim\
-                WHERE publisher_id = '" + channel_claim_id + "'\
-                AND bid_state <> 'Spent'\
-                ORDER BY transaction_time ASC;"
+                WHERE publisher_id = '" + channel_claim_id + "'"
+
+    if not include_abandoned:
+        query += "AND bid_state <> 'Spent'"
+
+    query += "ORDER BY transaction_time ASC;"
     request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
     the_dict = request.json()
 
@@ -124,9 +127,6 @@ def view_counts(channel_name, auth_token):
                     "&" +\
                     "claim_id=" + claim_id
         result = requests.get(url)
-#        print(the_dict["data"][i])
-#        print("\n\n")
-#        print(result.json())
 
         view_counts.append(result.json()["data"][0])
         message = "Claim {k}/{n} with title \""\
