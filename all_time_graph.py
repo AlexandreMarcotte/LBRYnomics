@@ -16,7 +16,8 @@ times = []
 
 # Iterate over query results
 i = 0
-for t in c.execute("SELECT creation_timestamp FROM claim"):
+for t in c.execute("SELECT creation_timestamp FROM claim\
+                              WHERE claim_type <> 2;"): # Exclude channel claims
     times.append(t)
     i = i + 1
     print(i)
@@ -28,22 +29,20 @@ conn.close()
 # Sort the times and convert to a numpy array
 times = np.sort(np.array(times))
 
-# Remove pending ones
-times = times[times >= 1E9]
-
 plt.rcParams["font.family"] = "serif"
 plt.rcParams["font.size"] = 14
 plt.rc("text", usetex=True)
 
-plt.figure(figsize=(15, 10))
+plt.figure(figsize=(15, 11))
 
 plt.subplot(2, 1, 1)
-times_in_days = (times - times.min())/86400.0
+times_in_days = (times - 1483228800)/86400.0
+days = times_in_days.astype("int64")
 plt.plot(times_in_days,
             np.arange(len(times)), "k-", linewidth=1.5)
 plt.ylabel("Cumulative number of claims")
 plt.title("Total number of claims = {n}.".format(n=len(times)))
-plt.xlim([0.0, times_in_days.max()])
+plt.xlim([0.0, days.max() + 1])
 plt.ylim(bottom=-100)
 plt.gca().grid(True)
 plt.gca().tick_params(labelright=True)
@@ -51,10 +50,8 @@ plt.gca().tick_params(labelright=True)
 
 
 plt.subplot(2, 1, 2)
-# Integers
-days = times_in_days.astype("int64")
 bin_width = 1.0
-bins = np.arange(0, np.max(days)+1) - 0.5*bin_width # Bin edges including right edge of last bin
+bins = np.arange(0, np.max(days)+2) - 0.5*bin_width # Bin edges including right edge of last bin
 counts = plt.hist(days, bins, alpha=0.5, color="g", label="Raw",
                     width=bin_width, align="mid")[0]
 
@@ -68,8 +65,8 @@ for i in range(len(moving_average)):
 plt.plot(bins[0:-1] + 0.5*bin_width, moving_average, "k-",
             label="10-day moving average", linewidth=1.5)
 #        plt.gca().set_yscale("log")
-plt.xlim([0.0, times_in_days.max()])
-plt.xlabel("Time (days since LBRY began)")
+plt.xlim([0.0, days.max() + 1])
+plt.xlabel("Time (days since 2017-01-01)")
 plt.ylabel("New claims added each day")
 subset = counts[-30:]
 plt.title("Recent average rate (last 30 days) = {n} claims per day.".\
@@ -80,7 +77,7 @@ plt.gca().tick_params(labelright=True)
 #        plt.gca().set_yticklabels(["1", "10", "100", "1000", "10000"])
 plt.legend()
 
-#plt.savefig("claims.svg", bbox_inches="tight")
-#print("Figure saved to claims.svg.")
+plt.savefig("claims.svg", bbox_inches="tight")
+print("Figure saved to claims.svg.")
 plt.show()
 
