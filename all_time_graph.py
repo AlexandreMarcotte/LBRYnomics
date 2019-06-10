@@ -39,11 +39,12 @@ plt.figure(figsize=(15, 10))
 
 plt.subplot(2, 1, 1)
 times_in_days = (times - times.min())/86400.0
+days = times_in_days.astype("int64")
 plt.plot(times_in_days,
             np.arange(len(times)), "k-", linewidth=1.5)
 plt.ylabel("Cumulative number of claims")
 plt.title("Total number of claims = {n}.".format(n=len(times)))
-plt.xlim([0.0, times_in_days.max()])
+plt.xlim([0.0, days.max() + 1])
 plt.ylim(bottom=-100)
 plt.gca().grid(True)
 plt.gca().tick_params(labelright=True)
@@ -51,10 +52,8 @@ plt.gca().tick_params(labelright=True)
 
 
 plt.subplot(2, 1, 2)
-# Integers
-days = times_in_days.astype("int64")
 bin_width = 1.0
-bins = np.arange(0, np.max(days)+1) - 0.5*bin_width # Bin edges including right edge of last bin
+bins = np.arange(0, np.max(days)+2) - 0.5*bin_width # Bin edges including right edge of last bin
 counts = plt.hist(days, bins, alpha=0.5, color="g", label="Raw",
                     width=bin_width, align="mid")[0]
 
@@ -68,7 +67,7 @@ for i in range(len(moving_average)):
 plt.plot(bins[0:-1] + 0.5*bin_width, moving_average, "k-",
             label="10-day moving average", linewidth=1.5)
 #        plt.gca().set_yscale("log")
-plt.xlim([0.0, times_in_days.max()])
+plt.xlim([0.0, days.max() + 1])
 plt.xlabel("Time (days since LBRY began)")
 plt.ylabel("New claims added each day")
 subset = counts[-30:]
