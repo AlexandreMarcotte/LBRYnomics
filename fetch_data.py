@@ -18,7 +18,9 @@ lbry = ira.lbryRPC()
 def all_claim_times(plot=False):
     """
     Get the timestamps of all claims and plot the cumulative number vs. time!
+    DEPRECATED! Replaced by all_time_graph.py
     """
+    print("all_claim_times is deprecated.")
 
     # The SQL query to perform
     query = "SELECT transaction.transaction_time time\
