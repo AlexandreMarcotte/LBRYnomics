@@ -62,7 +62,7 @@ for i in range(len(moving_average)):
     if len(subset) >= 10:
         subset = subset[-10:]
     moving_average[i] = np.mean(subset)
-plt.plot(bins[0:-1] + 0.5*bin_width, moving_average, "k-",
+plt.plot(bins[0:-2] + 0.5*bin_width, moving_average[0:-1], "k-",
             label="10-day moving average", linewidth=1.5)
 #        plt.gca().set_yscale("log")
 plt.xlim([0.0, days.max() + 1])
