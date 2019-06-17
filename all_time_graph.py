@@ -68,8 +68,8 @@ plt.plot(bins[0:-2] + 0.5*bin_width, moving_average[0:-1], "k-",
 plt.xlim([0.0, days.max() + 1])
 plt.xlabel("Time (days since 2017-01-01)")
 plt.ylabel("New claims added each day")
-subset = counts[-30:]
-plt.title("Recent average rate (last 30 days) = {n} claims per day.".\
+subset = counts[-31:-1]
+plt.title("Recent average rate (last 30 full days) = {n} claims per day.".\
             format(n=int(subset.mean())))
 plt.gca().grid(True)
 plt.gca().tick_params(labelright=True)
