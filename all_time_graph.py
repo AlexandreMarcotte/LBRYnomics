@@ -47,8 +47,7 @@ plt.ylim(bottom=-100)
 plt.gca().grid(True)
 plt.gca().tick_params(labelright=True)
 
-
-
+import time
 plt.subplot(2, 1, 2)
 bin_width = 1.0
 bins = np.arange(0, np.max(days)+2) - 0.5*bin_width # Bin edges including right edge of last bin
@@ -69,8 +68,8 @@ plt.xlim([0.0, days.max() + 1])
 plt.xlabel("Time (days since 2017-01-01)")
 plt.ylabel("New claims added each day")
 subset = counts[-31:-1]
-plt.title("Recent average rate (last 30 full days) = {n} claims per day.".\
-            format(n=int(subset.mean())))
+plt.title("Recent average rate (last 30 days) = {n} claims per day.".\
+            format(n=np.sum(time.time() - times <= 30.0*86400.0)/30.0))
 plt.gca().grid(True)
 plt.gca().tick_params(labelright=True)
 #        plt.gca().set_yticks([1.0, 10.0, 100.0, 1000.0, 10000.0])
