@@ -69,7 +69,7 @@ plt.xlabel("Time (days since 2017-01-01)")
 plt.ylabel("New claims added each day")
 subset = counts[-31:-1]
 plt.title("Recent average rate (last 30 days) = {n} claims per day.".\
-            format(n=np.sum(time.time() - times <= 30.0*86400.0)/30.0))
+            format(n=int(np.sum(time.time() - times <= 30.0*86400.0)/30.0)))
 plt.gca().grid(True)
 plt.gca().tick_params(labelright=True)
 #        plt.gca().set_yticks([1.0, 10.0, 100.0, 1000.0, 10000.0])
