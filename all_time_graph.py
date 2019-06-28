@@ -21,10 +21,17 @@ def make_graph(mode):
     # List for results
     times = []
 
+    # Query
+    if mode == "claims":
+        x = "<>"
+    else:
+        x = "="
+    query = "SELECT creation_timestamp FROM claim\
+                                  WHERE claim_type {x} 2;".format(x=x)
+
     # Iterate over query results
     i = 0
-    for t in c.execute("SELECT creation_timestamp FROM claim\
-                                  WHERE claim_type <> 2;"): # Exclude channel claims
+    for t in c.execute(query):
         times.append(t)
         i = i + 1
         print(i)
@@ -47,8 +54,8 @@ def make_graph(mode):
     days = times_in_days.astype("int64")
     plt.plot(times_in_days,
                 np.arange(len(times)), "k-", linewidth=1.5)
-    plt.ylabel("Cumulative number of claims")
-    plt.title("Total number of claims = {n}.".format(n=len(times)))
+    plt.ylabel("Cumulative number of {mode}".format(mode=mode))
+    plt.title("Total number of {mode} = {n}.".format(n=len(times), mode=mode))
     plt.xlim([0.0, days.max() + 1])
     plt.ylim(bottom=-100)
     plt.gca().grid(True)
@@ -60,7 +67,10 @@ def make_graph(mode):
 
     # Bin edges including right edge of last bin
     bins = np.arange(0, np.max(days)+2) - 0.5*bin_width
-    counts = plt.hist(days, bins, alpha=0.5, color="g", label="Raw",
+    color = "g"
+    if mode == "channels":
+        color="b"
+    counts = plt.hist(days, bins, alpha=0.5, color=color, label="Raw",
                         width=bin_width, align="mid")[0]
 
     # Compute 10-day moving average
@@ -75,23 +85,26 @@ def make_graph(mode):
     #        plt.gca().set_yscale("log")
     plt.xlim([0.0, days.max() + 1])
     plt.xlabel("Time (days since 2017-01-01)")
-    plt.ylabel("New claims added each day")
+    plt.ylabel("New {mode}s added each day".format(mode=mode))
     subset = counts[-31:-1]
-    plt.title("Recent average rate (last 30 days) = {n} claims per day.".\
-                format(n=int(np.sum(time.time() - times <= 30.0*86400.0)/30.0)))
+    plt.title("Recent average rate (last 30 days) = {n} {mode} per day.".\
+                format(n=int(np.sum(time.time() - times <= 30.0*86400.0)/30.0),
+                       mode=mode))
     plt.gca().grid(True)
     plt.gca().tick_params(labelright=True)
     #        plt.gca().set_yticks([1.0, 10.0, 100.0, 1000.0, 10000.0])
     #        plt.gca().set_yticklabels(["1", "10", "100", "1000", "10000"])
     plt.legend()
 
-    plt.savefig("claims.svg", bbox_inches="tight")
+    plt.savefig("{mode}.svg".format(mode=mode), bbox_inches="tight")
     import os
-    os.system("cp claims.svg /keybase/public/brendonbrewer/lbry-social")
-    print("Figure saved to claims.svg.")
+    os.system("cp {mode}.svg /keybase/public/brendonbrewer/lbry-social"\
+                    .format(mode=mode))
+    print("Figure saved to {mode}.svg.".format(mode=mode))
     plt.show()
 
 if __name__ == "__main__":
     make_graph("claims")
+    make_graph("channels")
 
 
