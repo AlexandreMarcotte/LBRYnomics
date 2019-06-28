@@ -77,6 +77,8 @@ plt.gca().tick_params(labelright=True)
 plt.legend()
 
 plt.savefig("claims.svg", bbox_inches="tight")
+import os
+os.system("cp claims.svg /keybase/public/brendonbrewer/lbry-social")
 print("Figure saved to claims.svg.")
 plt.show()
 
