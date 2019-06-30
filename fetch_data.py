@@ -102,7 +102,7 @@ def view_counts(channel_name, auth_token, include_abandoned=False):
     # Get the channel's claim_id by doing a lbrynet resolve
 
     result = lbry.lbry_call("resolve", {"urls": [channel_name]})
-    channel_claim_id = result[0][channel_name]["certificate"]["claim_id"]
+    channel_claim_id = result[0][channel_name]["claim_id"]
 
     # For channels
     url = "https://api.lbry.com/subscription/sub_count?auth_token=" +\
@@ -153,7 +153,7 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
     # Get the channel's claim_id by doing a lbrynet resolve
 
     result = lbry.lbry_call("resolve", {"urls": [channel_name]})
-    channel_claim_id = result[0][channel_name]["certificate"]["claim_id"]
+    channel_claim_id = result[0][channel_name]["claim_id"]
 
     # The SQL query to perform
     # to get support amounts and times from the channel content
