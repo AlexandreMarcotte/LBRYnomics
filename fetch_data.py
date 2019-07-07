@@ -97,6 +97,20 @@ def all_claim_times(plot=False):
 
     return times
 
+
+def view_count(url, auth_token):
+    """
+    A single view count
+    """
+    result = lbry.lbry_call("resolve", {"urls": [url]})
+    claim_id = result[0][url]["claim_id"]
+    url = "https://api.lbry.com/file/view_count?auth_token=" + auth_token + \
+                "&" +\
+                "claim_id=" + claim_id
+    result = requests.get(url)
+    return result.json()["data"][0]
+
+
 def view_counts(channel_name, auth_token, include_abandoned=False):
 
     # Get the channel's claim_id by doing a lbrynet resolve
