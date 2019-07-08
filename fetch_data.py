@@ -172,9 +172,9 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
     channel_claim_id = result[0][channel_name]["claim_id"]
 
     # The SQL query to perform
-    # to get support amounts and times from the channel content
-    # AND the channel itself. Note: currently would include non-tip
-    # supports, but there shouldn't be too much of that going on.
+    # NB: The use of the claim_address and the address_list from the output
+    # table is to try to only capture tips (not other supports). This also
+    # will not capture tips sent to the channel itself.
     query = "SELECT support_amount amount, transaction.transaction_time time,\
                                 transaction.hash, output.address_list, claim.claim_address\
              FROM\
