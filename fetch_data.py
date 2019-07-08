@@ -176,27 +176,32 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
     # AND the channel itself. Note: currently would include non-tip
     # supports, but there shouldn't be too much of that going on.
     query = "SELECT support_amount amount, transaction.transaction_time time,\
-                                transaction.hash\
+                                transaction.hash, output.address_list, claim.claim_address\
              FROM\
                  claim\
                  INNER JOIN support\
                  ON claim.claim_id = support.supported_claim_id\
                  INNER JOIN transaction\
                  ON support.transaction_hash_id = transaction.hash\
-                 WHERE publisher_id = '" + channel_claim_id + "';"# \
-#                    OR support.supported_claim_id = '" +\
-#                    channel_claim_id + "';"
+                 INNER JOIN output\
+                 ON transaction.hash = output.transaction_hash\
+                 WHERE publisher_id = '" + channel_claim_id + "';"
+
     request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
     the_dict = request.json()
 
-    # Test for success
-    #if the_dict["success"]:
+    amounts = []
+    times   = []
+    for i in range(len(the_dict["data"])):
+        claim_address = the_dict["data"][i]["claim_address"]
+        address_list = the_dict["data"][i]["address_list"]
 
-    amounts = np.empty(len(the_dict["data"]))
-    times   = np.empty(len(the_dict["data"]))
-    for i in range(len(times)):
-        amounts[i] = float(the_dict["data"][i]["amount"])
-        times[i]   = float(the_dict["data"][i]["time"]) + rng.rand()
+        if address_list == "[\"" + claim_address + "\"]":
+            amounts.append(float(the_dict["data"][i]["amount"]))
+            times.append(float(the_dict["data"][i]["time"]) + rng.rand())
+
+    amounts = np.array(amounts)
+    times = np.array(times)
 
     # Put amounts and times in time order
     indices = np.argsort(times)
