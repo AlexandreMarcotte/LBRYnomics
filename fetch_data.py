@@ -185,7 +185,8 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
                  ON support.transaction_hash_id = transaction.hash\
                  INNER JOIN output\
                  ON transaction.hash = output.transaction_hash\
-                 WHERE publisher_id = '" + channel_claim_id + "';"
+                 WHERE publisher_id = '" + channel_claim_id + "'\
+                        AND output.address_list LIKE CONCAT('%25', claim_address, '%25')"
 
     request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
     the_dict = request.json()
@@ -193,12 +194,8 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
     amounts = []
     times   = []
     for i in range(len(the_dict["data"])):
-        claim_address = the_dict["data"][i]["claim_address"]
-        address_list = the_dict["data"][i]["address_list"]
-
-        if address_list == "[\"" + claim_address + "\"]":
-            amounts.append(float(the_dict["data"][i]["amount"]))
-            times.append(float(the_dict["data"][i]["time"]) + rng.rand())
+        amounts.append(float(the_dict["data"][i]["amount"]))
+        times.append(float(the_dict["data"][i]["time"]) + rng.rand())
 
     amounts = np.array(amounts)
     times = np.array(times)
