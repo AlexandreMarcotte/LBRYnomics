@@ -269,7 +269,7 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
 
         plt.figure(figsize=(10, 5))
         for i in range(len(amounts)):
-            plt.plot([times[i], times[i]], [0.0, amounts[i]], "b-", alpha=0.5)
+            plt.plot([times[i], times[i]], [0.0, amounts[i]], "b-", alpha=0.2)
         plt.ylim(bottom=0.0)
         t_range = t_end - t_start
         plt.xlim(t_start - 0.01*t_range, t_end)
