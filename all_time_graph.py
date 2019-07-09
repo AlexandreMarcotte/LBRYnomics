@@ -34,7 +34,7 @@ def make_graph(mode):
     for t in c.execute(query):
         times.append(t)
         i = i + 1
-        print(i)
+    print("{K} {mode}. ".format(K=len(times), mode=mode), end="", flush=True)
 
     # We can also close the connection if we are done with it.
     # Just be sure any changes have been committed or they will be lost.
