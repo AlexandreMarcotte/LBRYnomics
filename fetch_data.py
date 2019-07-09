@@ -175,21 +175,19 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
     # NB: The use of the claim_address and the address_list from the output
     # table is to try to only capture tips (not other supports). This also
     # will not capture tips sent to the channel itself.
-    query = "SELECT support_amount amount, transaction.transaction_time time,\
-                                transaction.hash, output.address_list, claim.claim_address\
-             FROM\
-                 claim\
-                 INNER JOIN support\
-                 ON claim.claim_id = support.supported_claim_id\
-                 INNER JOIN transaction\
-                 ON support.transaction_hash_id = transaction.hash\
-                 INNER JOIN output\
-                 ON transaction.hash = output.transaction_hash\
-                 WHERE publisher_id = '" + channel_claim_id + "'\
-                        AND output.address_list LIKE CONCAT('%25', claim_address, '%25')"
+    query = "SELECT support.id as support_id, support.support_amount amount, transaction.transaction_time time\
+                FROM claim\
+                INNER JOIN support ON support.supported_claim_id = claim.claim_id\
+                INNER JOIN transaction ON support.transaction_hash_id = transaction.hash\
+                INNER JOIN output ON transaction.hash = output.transaction_hash \
+                WHERE publisher_id = '" + channel_claim_id + "'\
+                  AND output.address_list LIKE CONCAT('%25', claim_address, '%25')\
+                GROUP BY support.id, support.support_amount, support.created_at"
 
     request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
     the_dict = request.json()
+#    print(request.json())
+#    exit()
 
     amounts = []
     times   = []
