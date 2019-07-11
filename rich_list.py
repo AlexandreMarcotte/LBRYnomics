@@ -20,6 +20,7 @@ f = open("rich_list.csv", "w")
 f.write("channel_name,months_since_first_tip,num_tips,lbc_received,lbc_per_month\n")
 f.flush()
 
+k = 0
 for channel in channels:
     try:
         fetch_data.data_to_yaml(channel)
@@ -50,6 +51,8 @@ for channel in channels:
 
     except:
         pass
+    k += 1
+    print("Processed {k} channels.\n\n".format(k=k), flush=True)
 
 f.close()
 
