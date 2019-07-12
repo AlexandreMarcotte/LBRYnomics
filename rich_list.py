@@ -19,12 +19,13 @@ query = "SELECT name, almost.* FROM\
 request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
 the_dict = request.json()
 
-print("vanity_name,claim_id,total_lbc_tips")
+print("rank,vanity_name,claim_id,total_lbc_tips")
 k = 0
 for row in the_dict["data"]:
     if row["publisher_id"] is not None:
-        print(str(row["name"]) + "," + str(row["publisher_id"]) + "," + str(row["total_lbc"]))
         k += 1
+        print(str(k) + "," + str(row["name"]) + "," + str(row["publisher_id"]) + "," + str(row["total_lbc"]))
+
     if k >= 1000:
         break
 
