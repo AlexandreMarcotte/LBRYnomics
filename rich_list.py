@@ -1,58 +1,25 @@
-import fetch_data
-import numpy as np
-import pandas as pd
-import showresults
-import subprocess
-import yaml
+import requests
 
-# List of channels to make forecasts for
-data = pd.read_csv("channels.csv")
-channels = []
-for i in range(data.shape[0]):
-    if data.iloc[i, 0][0] == "@":
-        channels.append(data.iloc[i, 0] + "#" +  data.iloc[i, 1])
-channels = sorted(channels, key=lambda s: s.lower())
+# The SQL query to perform
+# NB: The use of the claim_address and the address_list from the output
+# table is to try to only capture tips (not other supports). This also
+# will not capture tips sent to the channel itself.
+query = "SELECT claim.name, claim.id, total_lbc from (SELECT t.publisher_id, SUM(t.amount) total_lbc from (SELECT name, publisher_id, support.support_amount amount\
+            FROM claim\
+            INNER JOIN support ON support.supported_claim_id = claim.claim_id\
+            INNER JOIN transaction ON support.transaction_hash_id = transaction.hash\
+            INNER JOIN output ON transaction.hash = output.transaction_hash \
+              AND output.address_list LIKE CONCAT('%25', claim_address, '%25')\
+            GROUP BY support.id, support.support_amount, support.created_at) as t\
+                GROUP BY publisher_id\
+                ORDER BY total_lbc DESC) almost\
+            INNER JOIN claim\
+            ON almost.publisher_id = claim.id"
 
-import sys
+request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
+the_dict = request.json()
+print(the_dict)
 
-# Open output CSV file
-f = open("rich_list.csv", "w")
-f.write("channel_name,months_since_first_tip,num_tips,lbc_received,lbc_per_month\n")
-f.flush()
-
-k = 0
-for channel in channels:
-    try:
-        fetch_data.data_to_yaml(channel)
-
-        yaml_file = open("data.yaml")
-        data = yaml.load(yaml_file, Loader=yaml.SafeLoader)
-        src = data["src"]
-        yaml_file.close()
-        yaml_file = open(src)
-        data = yaml.load(yaml_file, Loader=yaml.SafeLoader)
-        yaml_file.close()
-
-        f.write(channel + ",")
-        duration = data["t_end"] - data["t_start"]
-        f.write(str(np.round(duration, 2)) + ",")
-
-        tot = 0.0
-        if data["amounts"] is not None and len(data["amounts"]) > 0:
-            for amount in data["amounts"]:
-                tot += float(amount) # Sometimes yaml thinks it's a string
-
-        f.write(str(len(data["amounts"])) + ",")
-        f.write(str(np.round(tot, 2)) + ",")
-        f.write(str(np.round(tot/duration, 2)) + ",")
-
-        f.write("\n")
-        f.flush()
-
-    except:
-        pass
-    k += 1
-    print("Processed {k} channels.\n\n".format(k=k), flush=True)
-
-f.close()
-
+for row in the_dict["data"]:
+    if row["id"] is not None:
+        print(str(row["name"]) + "#" + str(row["id"]) + "," + str(row["total_lbc"]))
