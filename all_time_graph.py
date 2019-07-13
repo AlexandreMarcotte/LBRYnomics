@@ -6,12 +6,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sqlite3
 
-def make_graph(mode):
+def make_graph(mode, show=True):
     """
     mode must be "claims" or "channels"
     """
     if mode != "claims" and mode != "channels":
         return
+
+    plt.close("all")
 
     # Open the DB
     db_file = "/home/brewer/local/lbry-sdk/lbry/lbryum-data/claims.db"
@@ -101,10 +103,17 @@ def make_graph(mode):
     os.system("cp {mode}.svg /keybase/public/brendonbrewer/lbry-social"\
                     .format(mode=mode))
     print("Figure saved to {mode}.svg.".format(mode=mode))
-    plt.show()
+    if show:
+        plt.show()
 
 if __name__ == "__main__":
+    # Do it manually once then enter the infinite loop
     make_graph("claims")
     make_graph("channels")
-
+    import time
+    while True:
+        print("", flush=True)
+        time.sleep(600.0)
+        make_graph("claims", show=False)
+        make_graph("channels", show=False)
 
