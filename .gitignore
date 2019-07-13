@@ -3,6 +3,7 @@ Docs/*.aux
 Docs/*.log
 Docs/*.pdf
 __pycache__
+channels.svg
 claims.svg
 data.yaml
 forecasts.csv
@@ -10,6 +11,7 @@ main
 levels.txt
 log_prior_weights.txt
 posterior_sample.txt
+richlist.csv
 sample.txt
 sample_info.txt
 sampler_state.txt
