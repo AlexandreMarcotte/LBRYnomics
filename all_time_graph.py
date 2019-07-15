@@ -5,6 +5,7 @@ Get the timestamps of all claims and plot the cumulative number vs. time!
 import matplotlib.pyplot as plt
 import numpy as np
 import sqlite3
+import time
 
 def make_graph(mode, show=True):
     """
@@ -45,6 +46,12 @@ def make_graph(mode, show=True):
     # Sort the times and convert to a numpy array
     times = np.sort(np.array(times))
 
+    # Look at the last 24 hours
+    today = np.sum(times > (time.time() - 86400.0))
+    f = open("24hr_{mode}.txt".format(mode=mode), "w")
+    f.write(str(today))
+    f.close()
+
     plt.rcParams["font.family"] = "serif"
     plt.rcParams["font.size"] = 14
     plt.rc("text", usetex=True)
@@ -63,7 +70,6 @@ def make_graph(mode, show=True):
     plt.gca().grid(True)
     plt.gca().tick_params(labelright=True)
 
-    import time
     plt.subplot(2, 1, 2)
     bin_width = 1.0
 
@@ -101,6 +107,8 @@ def make_graph(mode, show=True):
     plt.savefig("{mode}.svg".format(mode=mode), bbox_inches="tight")
     import os
     os.system("cp {mode}.svg /keybase/public/brendonbrewer/lbry-social"\
+                    .format(mode=mode))
+    os.system("cp 24hr_{mode}.txt /keybase/public/brendonbrewer/lbry-social"\
                     .format(mode=mode))
     print("Figure saved to {mode}.svg.".format(mode=mode))
     if show:
