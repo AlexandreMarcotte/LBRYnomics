@@ -137,29 +137,39 @@ def aggregate_tips():
     # The SQL query to perform
     now = time.time()
 
-    labels = ["1_hour", "24_hours", "7_days", "30_days"]
-    windows = [3600.0, 86400.0, 7*86400.0, 30*86400.0]
+    labels = ["30_days", "7_days", "24_hours", "1_hour"]
+    windows = [30*86400.0, 7*86400.0, 1*86400.0, 3600.0]
     result = {}
     result["unix_time"] = now
 
-    for i in range(len(labels)):
-        query = "SELECT support.id as support_id, support.support_amount amount,\
-                                transaction.transaction_time time\
-                    FROM claim\
-                    INNER JOIN support ON support.supported_claim_id = claim.claim_id\
-                    INNER JOIN transaction ON support.transaction_hash_id = transaction.hash\
-                    INNER JOIN output ON transaction.hash = output.transaction_hash \
-                    WHERE output.address_list LIKE CONCAT('%25', claim_address, '%25')\
-                          AND transaction.transaction_time > ({now} - {window})\
-                    GROUP BY support.id, support.support_amount, support.created_at"\
-                        .format(now=now, window=windows[i])
+    query = "SELECT support.id as support_id, support.support_amount amount,\
+                            transaction.transaction_time time\
+                FROM claim\
+                INNER JOIN support ON support.supported_claim_id = claim.claim_id\
+                INNER JOIN transaction ON support.transaction_hash_id = transaction.hash\
+                INNER JOIN output ON transaction.hash = output.transaction_hash \
+                WHERE output.address_list LIKE CONCAT('%25', claim_address, '%25')\
+                      AND transaction.transaction_time > ({now} - {window})\
+                      AND transaction.transaction_time <= {now}\
+                GROUP BY support.id, support.support_amount, support.created_at"\
+                    .format(now=now, window=windows[0])
 
-        request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
-        the_dict = request.json()
-        tips = []
-        for row in the_dict["data"]:
-            tips.append(float(row["amount"]))
-        tips = np.array(tips)
+    request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
+    the_dict = request.json()
+
+    # Get tips into numpy array
+    times = []
+    tips = []
+    for row in the_dict["data"]:
+        times.append(float(row["time"]))
+        tips.append(float(row["amount"]))
+    times = np.array(times)
+    tips = np.array(tips)
+
+    for i in range(len(labels)):
+        keep = times > (now - windows[i])
+        times = times[keep]
+        tips = tips[keep]
         result["num_tips_{label}".format(label=labels[i])] = len(tips)
         result["lbc_tipped_{label}".format(label=labels[i])] = float(tips.sum())
         result["biggest_tip_{label}".format(label=labels[i])] = float(tips.max())
