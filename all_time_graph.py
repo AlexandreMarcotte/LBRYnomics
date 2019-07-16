@@ -162,7 +162,7 @@ def aggregate_tips():
     result["num_tips_24_hours"] = num
     result["lbc_tipped_24_hours"] = float(lbc.sum())
     result["biggest_tip_24_hours"] = float(lbc.max())
-    f = open("tip_stats.json", "w")
+    f = open("tips_stats.json", "w")
     f.write(json.dumps(result))
     f.close()
     os.system("cp tips_stats.json /keybase/public/brendonbrewer/lbry-social")
