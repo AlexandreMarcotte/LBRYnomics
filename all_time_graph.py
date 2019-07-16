@@ -132,40 +132,43 @@ def aggregate_tips():
     """
     Calculate tips over past X amount of time and write JSON output
     """
+    print("Computing tip stats...", end="", flush=True)
 
     # The SQL query to perform
     now = time.time()
-    window = 86400.0
 
-    query = "SELECT support.id as support_id, support.support_amount amount,\
-                            transaction.transaction_time time\
-                FROM claim\
-                INNER JOIN support ON support.supported_claim_id = claim.claim_id\
-                INNER JOIN transaction ON support.transaction_hash_id = transaction.hash\
-                INNER JOIN output ON transaction.hash = output.transaction_hash \
-                WHERE output.address_list LIKE CONCAT('%25', claim_address, '%25')\
-                      AND transaction.transaction_time > ({now} - {window})\
-                GROUP BY support.id, support.support_amount, support.created_at"\
-                    .format(now=now, window=window)
-
-    # Get all claims from the channel
-    request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
-    the_dict = request.json()
-    num = len(the_dict["data"])
-    lbc = np.zeros(num)
-    i = 0
-    for row in the_dict["data"]:
-        lbc[i] += float(row["amount"])
-        i += 1
+    labels = ["1_hour", "24_hours", "7_days", "30_days"]
+    windows = [3600.0, 86400.0, 7*86400.0, 30*86400.0]
     result = {}
     result["unix_time"] = now
-    result["num_tips_24_hours"] = num
-    result["lbc_tipped_24_hours"] = float(lbc.sum())
-    result["biggest_tip_24_hours"] = float(lbc.max())
+
+    for i in range(len(labels)):
+        query = "SELECT support.id as support_id, support.support_amount amount,\
+                                transaction.transaction_time time\
+                    FROM claim\
+                    INNER JOIN support ON support.supported_claim_id = claim.claim_id\
+                    INNER JOIN transaction ON support.transaction_hash_id = transaction.hash\
+                    INNER JOIN output ON transaction.hash = output.transaction_hash \
+                    WHERE output.address_list LIKE CONCAT('%25', claim_address, '%25')\
+                          AND transaction.transaction_time > ({now} - {window})\
+                    GROUP BY support.id, support.support_amount, support.created_at"\
+                        .format(now=now, window=windows[i])
+
+        request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
+        the_dict = request.json()
+        tips = []
+        for row in the_dict["data"]:
+            tips.append(float(row["amount"]))
+        tips = np.array(tips)
+        result["num_tips_{label}".format(label=labels[i])] = len(tips)
+        result["lbc_tipped_{label}".format(label=labels[i])] = float(tips.sum())
+        result["biggest_tip_{label}".format(label=labels[i])] = float(tips.max())
+
     f = open("tips_stats.json", "w")
     f.write(json.dumps(result))
     f.close()
     os.system("cp tips_stats.json /keybase/public/brendonbrewer/lbry-social")
+    print("done.")
     return(result)
 
 
