@@ -1,4 +1,4 @@
-24hr_*.txt
+*.json
 Data/*.yaml
 Docs/*.aux
 Docs/*.log

@@ -2,6 +2,7 @@
 Get the timestamps of all claims and plot the cumulative number vs. time!
 """
 
+import json
 import matplotlib.pyplot as plt
 import numpy as np
 import sqlite3
@@ -46,10 +47,21 @@ def make_graph(mode, show=True):
     # Sort the times and convert to a numpy array
     times = np.sort(np.array(times))
 
-    # Look at the last 24 hours
-    today = np.sum(times > (time.time() - 86400.0))
-    f = open("24hr_{mode}.txt".format(mode=mode), "w")
-    f.write(str(today))
+    # Save some stats to JSON for Electron
+    my_dict = {}
+    my_dict["current_time"] = time.time()
+    my_dict["total_{mode}".format(mode=mode)] = int(\
+                len(times))
+    my_dict["new_{mode}_1_hour".format(mode=mode)] = int(\
+                np.sum(times > (time.time() - 3600.0)))
+    my_dict["new_{mode}_24_hours".format(mode=mode)] = int(\
+                np.sum(times > (time.time() - 86400.0)))
+    my_dict["new_{mode}_7_days".format(mode=mode)] = int(\
+                np.sum(times > (time.time() - 7*86400.0)))
+    my_dict["new_{mode}_30_days".format(mode=mode)] = int(\
+                np.sum(times > (time.time() - 30*86400.0)))
+    f = open("{mode}_stats.json".format(mode=mode), "w")
+    f.write(json.dumps(my_dict))
     f.close()
 
     plt.rcParams["font.family"] = "serif"
@@ -108,7 +120,7 @@ def make_graph(mode, show=True):
     import os
     os.system("cp {mode}.svg /keybase/public/brendonbrewer/lbry-social"\
                     .format(mode=mode))
-    os.system("cp 24hr_{mode}.txt /keybase/public/brendonbrewer/lbry-social"\
+    os.system("cp {mode}_stats.json /keybase/public/brendonbrewer/lbry-social"\
                     .format(mode=mode))
     print("Figure saved to {mode}.svg.".format(mode=mode))
     if show:
