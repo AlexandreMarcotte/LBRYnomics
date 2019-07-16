@@ -51,7 +51,7 @@ def make_graph(mode, show=True):
 
     # Save some stats to JSON for Electron
     my_dict = {}
-    my_dict["current_time"] = time.time()
+    my_dict["unix_time"] = time.time()
     my_dict["total_{mode}".format(mode=mode)] = int(\
                 len(times))
     my_dict["new_{mode}_1_hour".format(mode=mode)] = int(\
@@ -158,14 +158,14 @@ def aggregate_tips():
         lbc[i] += float(row["amount"])
         i += 1
     result = {}
-    result["current_time"] = now
+    result["unix_time"] = now
     result["num_tips_24_hours"] = num
     result["lbc_tipped_24_hours"] = float(lbc.sum())
     result["biggest_tip_24_hours"] = float(lbc.max())
     f = open("tip_stats.json", "w")
     f.write(json.dumps(result))
     f.close()
-    os.system("cp tip_stats.json /keybase/public/brendonbrewer/lbry-social")
+    os.system("cp tips_stats.json /keybase/public/brendonbrewer/lbry-social")
     return(result)
 
 
