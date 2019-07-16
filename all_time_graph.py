@@ -5,6 +5,8 @@ Get the timestamps of all claims and plot the cumulative number vs. time!
 import json
 import matplotlib.pyplot as plt
 import numpy as np
+import os
+import requests
 import sqlite3
 import time
 
@@ -126,14 +128,57 @@ def make_graph(mode, show=True):
     if show:
         plt.show()
 
+def aggregate_tips():
+    """
+    Calculate tips over past X amount of time and write JSON output
+    """
+
+    # The SQL query to perform
+    now = time.time()
+    window = 86400.0
+
+    query = "SELECT support.id as support_id, support.support_amount amount,\
+                            transaction.transaction_time time\
+                FROM claim\
+                INNER JOIN support ON support.supported_claim_id = claim.claim_id\
+                INNER JOIN transaction ON support.transaction_hash_id = transaction.hash\
+                INNER JOIN output ON transaction.hash = output.transaction_hash \
+                WHERE output.address_list LIKE CONCAT('%25', claim_address, '%25')\
+                      AND transaction.transaction_time > ({now} - {window})\
+                GROUP BY support.id, support.support_amount, support.created_at"\
+                    .format(now=now, window=window)
+
+    # Get all claims from the channel
+    request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
+    the_dict = request.json()
+    num = len(the_dict["data"])
+    lbc = np.zeros(num)
+    i = 0
+    for row in the_dict["data"]:
+        lbc[i] += float(row["amount"])
+        i += 1
+    result = {}
+    result["num_tips_24_hours"] = num
+    result["lbc_tipped_24_hours"] = float(lbc.sum())
+    result["biggest_tip_24_hours"] = float(lbc.max())
+    f = open("tip_stats.json", "w")
+    f.write(json.dumps(result))
+    f.close()
+    os.system("cp tip_stats.json /keybase/public/brendonbrewer/lbry-social")
+    return(result)
+
+
+
 if __name__ == "__main__":
     # Do it manually once then enter the infinite loop
+    aggregate_tips()
     make_graph("claims")
     make_graph("channels")
     import time
     while True:
         print("", flush=True)
         time.sleep(600.0)
+        aggregate_tips()
         make_graph("claims", show=False)
         make_graph("channels", show=False)
 
