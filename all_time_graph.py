@@ -158,6 +158,7 @@ def aggregate_tips():
         lbc[i] += float(row["amount"])
         i += 1
     result = {}
+    result["current_time"] = now
     result["num_tips_24_hours"] = num
     result["lbc_tipped_24_hours"] = float(lbc.sum())
     result["biggest_tip_24_hours"] = float(lbc.max())
