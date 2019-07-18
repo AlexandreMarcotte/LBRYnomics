@@ -2,9 +2,7 @@ TipPredict
 ==========
 
 Bayesian extrapolation of [LBRY](https://api.lbry.io/user/refer?r=9pa98r9uUUFgJ4JpVr1YvH5dMEbXNTvo) tips*. This is work in progress and you probably
-shouldn't try to use it yet unless you're me. I am, however, publishing the
-output from it at `lbry://@BrendonBrewer/forecasts`, and I should be updating
-that quite regularly.
+shouldn't try to use it yet unless you're me.
 
 (c) 2019 Brendon J. Brewer. LICENCE: MIT.
 
@@ -25,6 +23,5 @@ Model idea:
 
 Todo list:
 
-    * Use exported transactions file from LBRY app as data source
     * Complexify model (variable poisson rate etc, borrow strength across claims/publishers)
-    * Get data from lbrynet directly instead of the app
+
