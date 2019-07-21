@@ -12,6 +12,7 @@ query = "SELECT name, almost.* FROM\
             INNER JOIN transaction ON support.transaction_hash_id = transaction.hash\
             INNER JOIN output ON transaction.hash = output.transaction_hash \
               AND output.address_list LIKE CONCAT('%25', claim_address, '%25')\
+              AND transaction.hash <> 'e867afabfa52bea6d5af84e65865dd5d0382c340646f1578192768033be48924'\
             GROUP BY support.id, support.support_amount, support.created_at) as t\
                 GROUP BY publisher_id\
                 ORDER BY total_lbc DESC) almost\
