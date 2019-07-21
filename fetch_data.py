@@ -182,6 +182,7 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
                 INNER JOIN output ON transaction.hash = output.transaction_hash \
                 WHERE publisher_id = '" + channel_claim_id + "'\
                   AND output.address_list LIKE CONCAT('%25', claim_address, '%25')\
+                  AND transaction.hash <> 'e867afabfa52bea6d5af84e65865dd5d0382c340646f1578192768033be48924'\
                 GROUP BY support.id, support.support_amount, support.created_at"
 
     request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
