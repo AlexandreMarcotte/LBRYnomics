@@ -137,6 +137,7 @@ def view_counts(channel_name, auth_token, include_abandoned=False):
     the_dict = request.json()
 
     view_counts = {}
+    tot = 0
     for i in range(len(the_dict["data"])):
         claim_id = the_dict["data"][i]["claim_id"]
         url = "https://api.lbry.com/file/view_count?auth_token=" + auth_token + \
@@ -147,6 +148,7 @@ def view_counts(channel_name, auth_token, include_abandoned=False):
         name = the_dict["data"][i]["name"]
         views = result.json()["data"][0]
         view_counts[name] = views
+        tot += views
         message = "Claim {k}/{n} with name \""\
                     + name + "\" has {v} views."
         print(message.format(k=i+1,
@@ -154,7 +156,7 @@ def view_counts(channel_name, auth_token, include_abandoned=False):
                 flush=True)
 
     return { "view_counts": view_counts,
-             "total_views": np.sum(view_counts),
+             "total_views": tot,
              "subscribers": subscribers }
 
 
