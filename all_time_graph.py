@@ -119,11 +119,6 @@ def make_graph(mode, show=True):
     plt.legend()
 
     plt.savefig("{mode}.svg".format(mode=mode), bbox_inches="tight")
-    import os
-    os.system("cp {mode}.svg /keybase/public/brendonbrewer/lbry-social"\
-                    .format(mode=mode))
-    os.system("cp {mode}_stats.json /keybase/public/brendonbrewer/lbry-social"\
-                    .format(mode=mode))
     print("Figure saved to {mode}.svg.".format(mode=mode))
     if show:
         plt.show()
@@ -177,7 +172,6 @@ def aggregate_tips():
     f = open("tips_stats.json", "w")
     f.write(json.dumps(result))
     f.close()
-    os.system("cp tips_stats.json /keybase/public/brendonbrewer/lbry-social")
     print("done.")
     return(result)
 
@@ -188,6 +182,8 @@ if __name__ == "__main__":
     aggregate_tips()
     make_graph("claims")
     make_graph("channels")
+    import os
+    os.system("./upload.sh > /dev/null")
     import time
     while True:
         print("", flush=True)
@@ -195,4 +191,5 @@ if __name__ == "__main__":
         aggregate_tips()
         make_graph("claims", show=False)
         make_graph("channels", show=False)
+        os.system("./upload.sh > /dev/null")
 
