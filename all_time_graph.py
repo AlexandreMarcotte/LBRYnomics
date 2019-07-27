@@ -54,7 +54,7 @@ def make_graph(mode, show=True):
     now = time.time()
     my_dict = {}
     my_dict["unix_time"] = now
-    my_dict["human_time_utc"] = str(datetime.datetime.utcfromtimestamp(now))
+    my_dict["human_time_utc"] = str(datetime.datetime.utcfromtimestamp(int(now)))
     my_dict["total_{mode}".format(mode=mode)] = int(\
                 len(times))
     my_dict["new_{mode}_1_hour".format(mode=mode)] = int(\
@@ -139,7 +139,7 @@ def aggregate_tips():
     windows = [30*86400.0, 7*86400.0, 1*86400.0, 3600.0]
     result = {}
     result["unix_time"] = now
-    result["human_time_utc"] = str(datetime.datetime.utcfromtimestamp(now))
+    result["human_time_utc"] = str(datetime.datetime.utcfromtimestamp(int(now)))
 
     query = "SELECT support.id as support_id, support.support_amount amount,\
                             transaction.transaction_time time\
