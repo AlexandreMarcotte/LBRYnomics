@@ -127,7 +127,8 @@ def view_counts(channel_name, auth_token, include_abandoned=False):
 
     # Get claim_ids from inside channel
     query = "SELECT name, claim_id, bid_state, valid_at_height, title FROM claim\
-                WHERE publisher_id = '" + channel_claim_id + "'"
+                WHERE publisher_id = '" + channel_claim_id + "'\
+                ORDER BY created_at ASC;"
 
     if not include_abandoned:
         query += "AND bid_state <> 'Spent'"
@@ -138,6 +139,7 @@ def view_counts(channel_name, auth_token, include_abandoned=False):
 
     view_counts = {}
     tot = 0
+    view_counts_list = []
     for i in range(len(the_dict["data"])):
         claim_id = the_dict["data"][i]["claim_id"]
         url = "https://api.lbry.com/file/view_count?auth_token=" + auth_token + \
@@ -148,6 +150,7 @@ def view_counts(channel_name, auth_token, include_abandoned=False):
         name = the_dict["data"][i]["name"]
         views = result.json()["data"][0]
         view_counts[name] = views
+        view_counts_list.append(views)
         tot += views
         message = "Claim {k}/{n} with name \""\
                     + name + "\" has {v} views."
@@ -156,6 +159,7 @@ def view_counts(channel_name, auth_token, include_abandoned=False):
                 flush=True)
 
     return { "view_counts": view_counts,
+             "view_counts_vector": np.array(view_counts_list),
              "total_views": tot,
              "subscribers": subscribers }
 
