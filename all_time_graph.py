@@ -2,6 +2,7 @@
 Get the timestamps of all claims and plot the cumulative number vs. time!
 """
 
+import datetime
 import json
 import matplotlib.pyplot as plt
 import numpy as np
@@ -50,18 +51,20 @@ def make_graph(mode, show=True):
     times = np.sort(np.array(times))
 
     # Save some stats to JSON for Electron
+    now = time.time()
     my_dict = {}
-    my_dict["unix_time"] = time.time()
+    my_dict["unix_time"] = now
+    my_dict["human_time_utc"] = str(datetime.datetime.utcfromtimestamp(now))
     my_dict["total_{mode}".format(mode=mode)] = int(\
                 len(times))
     my_dict["new_{mode}_1_hour".format(mode=mode)] = int(\
-                np.sum(times > (time.time() - 3600.0)))
+                np.sum(times > (now - 3600.0)))
     my_dict["new_{mode}_24_hours".format(mode=mode)] = int(\
-                np.sum(times > (time.time() - 86400.0)))
+                np.sum(times > (now - 86400.0)))
     my_dict["new_{mode}_7_days".format(mode=mode)] = int(\
-                np.sum(times > (time.time() - 7*86400.0)))
+                np.sum(times > (now - 7*86400.0)))
     my_dict["new_{mode}_30_days".format(mode=mode)] = int(\
-                np.sum(times > (time.time() - 30*86400.0)))
+                np.sum(times > (now - 30*86400.0)))
     f = open("{mode}_stats.json".format(mode=mode), "w")
     f.write(json.dumps(my_dict))
     f.close()
@@ -136,6 +139,7 @@ def aggregate_tips():
     windows = [30*86400.0, 7*86400.0, 1*86400.0, 3600.0]
     result = {}
     result["unix_time"] = now
+    result["human_time_utc"] = str(datetime.datetime.utcfromtimestamp(now))
 
     query = "SELECT support.id as support_id, support.support_amount amount,\
                             transaction.transaction_time time\
