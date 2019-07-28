@@ -180,6 +180,16 @@ def aggregate_tips():
     return(result)
 
 
+def publish_files():
+    """
+    Publish files to somewhere on the internet.
+    """
+    print("Publishing files to the internet...", end="", flush=True)
+    from subprocess import STDOUT, check_output
+    output = check_output("./upload.sh", stderr=STDOUT, timeout=30.0)
+    print("done.")
+    return output
+
 
 if __name__ == "__main__":
     # Do it manually once then enter the infinite loop
@@ -187,7 +197,7 @@ if __name__ == "__main__":
     make_graph("claims")
     make_graph("channels")
     import os
-    os.system("./upload.sh > /dev/null")
+    publish_files()
     import time
     while True:
         print("", flush=True)
@@ -195,5 +205,5 @@ if __name__ == "__main__":
         aggregate_tips()
         make_graph("claims", show=False)
         make_graph("channels", show=False)
-        os.system("./upload.sh > /dev/null")
+        publish_files()
 
