@@ -197,7 +197,10 @@ if __name__ == "__main__":
     make_graph("claims")
     make_graph("channels")
     import os
-    publish_files()
+    try:
+        publish_files()
+    except:
+        pass
     import time
     while True:
         print("", flush=True)
@@ -205,5 +208,8 @@ if __name__ == "__main__":
         aggregate_tips()
         make_graph("claims", show=False)
         make_graph("channels", show=False)
-        publish_files()
+        try:
+            publish_files()
+        except:
+            pass
 
