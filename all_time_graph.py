@@ -48,7 +48,7 @@ def make_graph(mode, show=True):
     conn.close()
 
     # Sort the times and convert to a numpy array
-    times = np.sort(np.array(times))
+    times = np.sort(np.array(times).flatten())
 
     # Save some stats to JSON for Electron
     now = time.time()
