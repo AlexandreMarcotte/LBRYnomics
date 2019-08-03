@@ -147,7 +147,7 @@ def view_counts(channel_name, auth_token, include_abandoned=False):
                     "claim_id=" + claim_id
         result = requests.get(url)
 
-        name = the_dict["data"][i]["name"]
+        name = str(the_dict["data"][i]["name"])
         views = result.json()["data"][0]
         view_counts[name] = views
         view_counts_list.append(views)
