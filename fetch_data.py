@@ -279,7 +279,7 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
         plt.xlim(t_start - 0.01*t_range, t_end)
         plt.xlabel("Time (unix time, months)", fontsize=12)
         plt.ylabel("Tip amount (LBC)", fontsize=12)
-        plt.title("Tip history for " + channel_name +\
+        plt.title("Tip history for " + channel_name.replace("#", "\#") +\
                     ". Total = {tot} LBC."\
                     .format(tot=np.round(np.sum(amounts), 2)),
                     fontsize=14)
