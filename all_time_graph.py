@@ -130,11 +130,12 @@ def aggregate_tips():
     """
     Calculate tips over past X amount of time and write JSON output
     """
-    print("Computing tip stats...", end="", flush=True)
+
 
     # The SQL query to perform
     now = time.time()
-
+    print("The time is " + str(datetime.datetime.utcfromtimestamp(int(now))) + ".")
+    print("Computing tip stats...", end="", flush=True)
     labels = ["30_days", "7_days", "24_hours", "1_hour"]
     windows = [30*86400.0, 7*86400.0, 1*86400.0, 3600.0]
     result = {}
