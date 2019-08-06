@@ -205,7 +205,7 @@ if __name__ == "__main__":
     import time
     while True:
         print("", flush=True)
-        time.sleep(600.0)
+        time.sleep(500.0)
         aggregate_tips()
         make_graph("claims", show=False)
         make_graph("channels", show=False)
