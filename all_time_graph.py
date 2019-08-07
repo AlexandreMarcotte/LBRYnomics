@@ -70,7 +70,7 @@ def make_graph(mode, show=True):
 
     # Count new claims this UTC day
     count_today = np.sum(times > 86400.0*int(now/86400.0))
-    print("{K} {mode}, {n} from today (UTC). ".format(K=len(times), mode=mode, n=count_today), end="", flush=True)
+    print("{K} {mode}, {n} from today so far (UTC). ".format(K=len(times), mode=mode, n=count_today), end="", flush=True)
 
 
 
@@ -180,7 +180,7 @@ def aggregate_tips():
     f = open("tips_stats.json", "w")
     f.write(json.dumps(result))
     f.close()
-    print("done.")
+    print("done. ", flush=True, end="")
     return(result)
 
 
@@ -199,7 +199,7 @@ if __name__ == "__main__":
 
     # Do it manually once then enter the infinite loop
     now = time.time()
-    print("The time is " + str(datetime.datetime.utcfromtimestamp(int(now))) + ".")
+    print("The time is " + str(datetime.datetime.utcfromtimestamp(int(now))) + " UTC.")
     make_graph("claims")
     make_graph("channels")
     aggregate_tips()
