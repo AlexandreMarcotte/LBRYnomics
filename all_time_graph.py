@@ -41,7 +41,6 @@ def make_graph(mode, show=True):
     for t in c.execute(query):
         times.append(t)
         i = i + 1
-    print("{K} {mode}. ".format(K=len(times), mode=mode), end="", flush=True)
 
     # We can also close the connection if we are done with it.
     # Just be sure any changes have been committed or they will be lost.
@@ -69,12 +68,18 @@ def make_graph(mode, show=True):
     f.write(json.dumps(my_dict))
     f.close()
 
+    # Count new claims this UTC day
+    count_today = np.sum(times > 86400.0*int(now/86400.0))
+    print("{K} {mode}, {n} from today (UTC). ".format(K=len(times), mode=mode, n=count_today), end="", flush=True)
+
+
+
+    # Plotting stuff
     plt.rcParams["font.family"] = "serif"
     plt.rcParams["font.size"] = 14
     plt.rc("text", usetex=True)
 
     plt.figure(figsize=(15, 11))
-
     plt.subplot(2, 1, 1)
     times_in_days = (times - 1483228800)/86400.0
     days = times_in_days.astype("int64")
@@ -131,10 +136,8 @@ def aggregate_tips():
     Calculate tips over past X amount of time and write JSON output
     """
 
-
     # The SQL query to perform
     now = time.time()
-    print("The time is " + str(datetime.datetime.utcfromtimestamp(int(now))) + ".")
     print("Computing tip stats...", end="", flush=True)
     labels = ["30_days", "7_days", "24_hours", "1_hour"]
     windows = [30*86400.0, 7*86400.0, 1*86400.0, 3600.0]
@@ -193,10 +196,14 @@ def publish_files():
 
 
 if __name__ == "__main__":
+
     # Do it manually once then enter the infinite loop
-    aggregate_tips()
+    now = time.time()
+    print("The time is " + str(datetime.datetime.utcfromtimestamp(int(now))) + ".")
     make_graph("claims")
     make_graph("channels")
+    aggregate_tips()
+
     import os
     try:
         publish_files()
@@ -206,9 +213,13 @@ if __name__ == "__main__":
     while True:
         print("", flush=True)
         time.sleep(500.0)
+
+        now = time.time()
+        print("The time is " + str(datetime.datetime.utcfromtimestamp(int(now))) + ".")
+        make_graph("claims")
+        make_graph("channels")
         aggregate_tips()
-        make_graph("claims", show=False)
-        make_graph("channels", show=False)
+
         try:
             publish_files()
         except:
