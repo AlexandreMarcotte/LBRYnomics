@@ -216,8 +216,8 @@ if __name__ == "__main__":
 
         now = time.time()
         print("The time is " + str(datetime.datetime.utcfromtimestamp(int(now))) + ".")
-        make_graph("claims")
-        make_graph("channels")
+        make_graph("claims", show=False)
+        make_graph("channels", show=False)
         aggregate_tips()
 
         try:
