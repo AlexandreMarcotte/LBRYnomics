@@ -127,11 +127,12 @@ def view_counts(channel_name, auth_token, include_abandoned=False):
 
     # Get claim_ids from inside channel
     query = "SELECT name, claim_id, bid_state, valid_at_height, title FROM claim\
-                WHERE publisher_id = '" + channel_claim_id + "'\
-                ORDER BY created_at ASC;"
-
+                WHERE publisher_id = '" + channel_claim_id + "'\n"
     if not include_abandoned:
         query += "AND bid_state <> 'Spent'"
+    query += "ORDER BY release_time, created_at ASC;"
+
+
 
     query += "ORDER BY transaction_time ASC;"
     request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
