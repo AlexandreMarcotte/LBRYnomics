@@ -202,7 +202,10 @@ if __name__ == "__main__":
     print("The time is " + str(datetime.datetime.utcfromtimestamp(int(now))) + " UTC.")
     make_graph("claims")
     make_graph("channels")
-    aggregate_tips()
+    try:
+        aggregate_tips()
+    except:
+        pass
 
     import os
     try:
@@ -218,7 +221,10 @@ if __name__ == "__main__":
         print("The time is " + str(datetime.datetime.utcfromtimestamp(int(now))) + ".")
         make_graph("claims", show=False)
         make_graph("channels", show=False)
-        aggregate_tips()
+        try:
+            aggregate_tips()
+        except:
+            pass
 
         try:
             publish_files()
