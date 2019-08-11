@@ -110,6 +110,29 @@ def view_count(url, auth_token):
     result = requests.get(url)
     return result.json()["data"][0]
 
+def subscriber_counts(auth_token):
+    """
+    Get subscriber counts for all channels. Assumes a file output.csv
+    exists which lists all channels with their name and claim_id.
+    """
+
+    import pandas as pd
+    channels = pd.read_csv("output.csv", header=None)
+    f = open("output2.csv", "w")
+    for i in range(channels.shape[0]):
+        url = "https://api.lbry.com/subscription/sub_count?auth_token=" +\
+                    auth_token + "&" +\
+                    "claim_id=" + channels.iloc[i, 1]
+        try:
+            result = requests.get(url)
+            subs = result.json()["data"][0]
+        except:
+            subs = 0
+
+        f.write(channels.iloc[i, 0] + "," + channels.iloc[i, 1] + ",")
+        f.write(str(subs) + "\n")
+        f.flush()
+    f.close()
 
 def view_counts(channel_name, auth_token, include_abandoned=False):
 
