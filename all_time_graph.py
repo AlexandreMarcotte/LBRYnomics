@@ -218,7 +218,7 @@ if __name__ == "__main__":
         time.sleep(500.0)
 
         now = time.time()
-        print("The time is " + str(datetime.datetime.utcfromtimestamp(int(now))) + ".")
+        print("The time is " + str(datetime.datetime.utcfromtimestamp(int(now))) + " UTC.")
         make_graph("claims", show=False)
         make_graph("channels", show=False)
         try:
