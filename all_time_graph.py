@@ -188,11 +188,13 @@ def publish_files():
     """
     Publish files to somewhere on the internet.
     """
-    print("Publishing files to the internet.", flush=True)
+    print("Publishing files to the internet...", end="", flush=True)
     import subprocess
-    subprocess.run("./upload.sh", timeout=120.0)
-    print("done.\n")
-    return output
+    try:
+        subprocess.run("./upload.sh", timeout=120.0)
+        print("done.\n")
+    except:
+        print("failed.\n")
 
 
 if __name__ == "__main__":
