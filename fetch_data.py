@@ -117,8 +117,18 @@ def subscriber_counts(auth_token):
     """
 
     import pandas as pd
-    channels = pd.read_csv("output.csv", header=None)
-    f = open("output2.csv", "w")
+
+    # Assumes channels.csv exists with columns claim_name
+    # and claim_id, get this from claims.db
+    channels = pd.read_csv("channels.csv", header=None)
+
+    # Sort into alphabetical order
+    indices = np.arange(0, channels.shape[0])
+    indices = sorted(indices, key=lambda i: channels.iloc[i, 0].lower())
+    channels = channels.iloc[indices, :]
+
+    f = open("sub_counts.csv", "w")
+    f.write("vanity_name", "claim_id", "subscribers")
     for i in range(channels.shape[0]):
         url = "https://api.lbry.com/subscription/sub_count?auth_token=" +\
                     auth_token + "&" +\
