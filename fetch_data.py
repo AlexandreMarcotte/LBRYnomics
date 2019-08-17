@@ -128,7 +128,7 @@ def subscriber_counts(auth_token):
     channels = channels.iloc[indices, :]
 
     f = open("sub_counts.csv", "w")
-    f.write("vanity_name", "claim_id", "subscribers")
+    f.write("vanity_name,claim_id,subscribers")
     for i in range(channels.shape[0]):
         url = "https://api.lbry.com/subscription/sub_count?auth_token=" +\
                     auth_token + "&" +\
