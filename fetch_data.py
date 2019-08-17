@@ -118,9 +118,12 @@ def subscriber_counts(auth_token):
 
     import pandas as pd
 
-    # Assumes channels.csv exists with columns claim_name
-    # and claim_id, get this from claims.db
-    channels = pd.read_csv("channels.csv", header=None)
+    # Assumes channels.csv exists with columns claim_name, claim_id, and
+    # creation_timestamp. Get this from claims.db using the following in
+    # SQLITE3.
+    # sqlite> .output channels.svg
+    # sqlite> select claim_name, claim_id, creation_timestamp from claim where claim_type = 2;
+    channels = pd.read_csv("channels.csv", header=None, sep="|")
 
     # Sort into alphabetical order
     indices = np.arange(0, channels.shape[0])
@@ -128,7 +131,7 @@ def subscriber_counts(auth_token):
     channels = channels.iloc[indices, :]
 
     f = open("sub_counts.csv", "w")
-    f.write("vanity_name,claim_id,subscribers")
+    f.write("vanity_name,claim_id,creation_timestamp,subscribers\n")
     for i in range(channels.shape[0]):
         url = "https://api.lbry.com/subscription/sub_count?auth_token=" +\
                     auth_token + "&" +\
@@ -140,7 +143,7 @@ def subscriber_counts(auth_token):
             subs = 0
 
         f.write(channels.iloc[i, 0] + "," + channels.iloc[i, 1] + ",")
-        f.write(str(subs) + "\n")
+        f.write(str(channels.iloc[i, 2]) + "," + str(subs) + "\n")
         f.flush()
     f.close()
 
