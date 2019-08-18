@@ -145,17 +145,17 @@ def aggregate_tips():
     result["unix_time"] = now
     result["human_time_utc"] = str(datetime.datetime.utcfromtimestamp(int(now))) + " UTC"
 
-    query = "SELECT support.id as support_id, support.support_amount amount,\
-                            transaction.transaction_time time\
+    # Agrees with old method, but should it be SUM(amount)?
+    query = "SELECT support_id, amount, time, SUM(to_claim_address) tot FROM (SELECT support.id as support_id, support.support_amount amount,\
+                            transaction.transaction_time time,\
+                            (CASE WHEN (output.address_list LIKE CONCAT('%25', claim_address, '%25')) THEN '1' ELSE '0' END) to_claim_address\
                 FROM claim\
                 INNER JOIN support ON support.supported_claim_id = claim.claim_id\
                 INNER JOIN transaction ON support.transaction_hash_id = transaction.hash\
                 INNER JOIN output ON transaction.hash = output.transaction_hash \
-                WHERE output.address_list LIKE CONCAT('%25', claim_address, '%25')\
-                      AND transaction.transaction_time > ({now} - {window})\
-                      AND transaction.transaction_time <= {now}\
-                GROUP BY support.id, support.support_amount, support.created_at"\
-                    .format(now=now, window=windows[0])
+                WHERE transaction.transaction_time > ({now} - {window})\
+                      AND transaction.transaction_time <= {now}) AS result\
+                GROUP BY support_id, amount;".format(now=now, window=windows[0])
 
     request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
     the_dict = request.json()
@@ -163,25 +163,41 @@ def aggregate_tips():
     # Get tips into numpy array
     times = []
     tips = []
+    is_tip = []
     for row in the_dict["data"]:
         times.append(float(row["time"]))
         tips.append(float(row["amount"]))
+        if row["tot"] > 0:
+            is_tip.append(True)
+        else:
+            is_tip.append(False)
+
     times = np.array(times)
     tips = np.array(tips)
+    is_tip = np.array(is_tip)
 
+    # Write tips
     for i in range(len(labels)):
-        keep = times > (now - windows[i])
-        times = times[keep]
-        tips = tips[keep]
-        result["num_tips_{label}".format(label=labels[i])] = len(tips)
-        result["lbc_tipped_{label}".format(label=labels[i])] = float(tips.sum())
-        result["biggest_tip_{label}".format(label=labels[i])] = float(tips.max())
+        keep = (times > (now - windows[i])) & is_tip
+        _times = times[keep]
+        _tips = tips[keep]
+        result["num_tips_{label}".format(label=labels[i])] = len(_tips)
+        result["lbc_tipped_{label}".format(label=labels[i])] = float(_tips.sum())
+        result["biggest_tip_{label}".format(label=labels[i])] = float(_tips.max())
+
+    # Write supports
+    for i in range(len(labels)):
+        keep = (times > (now - windows[i])) & (~is_tip)
+        _times = times[keep]
+        _tips = tips[keep]
+        result["num_supports_{label}".format(label=labels[i])] = len(_tips)
+        result["lbc_supports_{label}".format(label=labels[i])] = float(_tips.sum())
+        result["biggest_support_{label}".format(label=labels[i])] = float(_tips.max())
 
     f = open("tips_stats.json", "w")
     f.write(json.dumps(result))
     f.close()
     print("done. ", flush=True, end="")
-    return(result)
 
 
 def publish_files():
