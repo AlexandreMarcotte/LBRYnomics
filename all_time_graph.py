@@ -183,7 +183,9 @@ def aggregate_tips():
         _tips = tips[keep]
         result["num_tips_{label}".format(label=labels[i])] = len(_tips)
         result["lbc_tipped_{label}".format(label=labels[i])] = float(_tips.sum())
-        result["biggest_tip_{label}".format(label=labels[i])] = float(_tips.max())
+        if len(_tips) > 0:
+            maxtip = float(_tips.max())
+        result["biggest_tip_{label}".format(label=labels[i])] = maxtip
 
     # Write supports
     for i in range(len(labels)):
@@ -192,7 +194,10 @@ def aggregate_tips():
         _tips = tips[keep]
         result["num_supports_{label}".format(label=labels[i])] = len(_tips)
         result["lbc_supports_{label}".format(label=labels[i])] = float(_tips.sum())
-        result["biggest_support_{label}".format(label=labels[i])] = float(_tips.max())
+        maxtip = 0
+        if len(_tips) > 0:
+            maxtip = float(_tips.max())
+        result["biggest_support_{label}".format(label=labels[i])] = maxtip
 
     f = open("tips_stats.json", "w")
     f.write(json.dumps(result))
