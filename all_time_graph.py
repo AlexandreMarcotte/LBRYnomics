@@ -183,6 +183,7 @@ def aggregate_tips():
         _tips = tips[keep]
         result["num_tips_{label}".format(label=labels[i])] = len(_tips)
         result["lbc_tipped_{label}".format(label=labels[i])] = float(_tips.sum())
+        maxtip = 0
         if len(_tips) > 0:
             maxtip = float(_tips.max())
         result["biggest_tip_{label}".format(label=labels[i])] = maxtip
