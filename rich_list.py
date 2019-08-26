@@ -62,6 +62,8 @@ for i in range(x.shape[0]):
         fresh["change"].append(np.nan)
         fresh["rank_change"].append(np.nan)
 fresh = pd.DataFrame(fresh)
+fresh["total_lbc_tips"] = np.round(fresh["total_lbc_tips"], 2)
+fresh["change"] = np.round(fresh["change"], 2)
 fresh.to_csv("richlist.csv", index=False)
 
 
