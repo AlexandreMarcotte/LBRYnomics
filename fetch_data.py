@@ -133,15 +133,6 @@ def subscriber_counts(auth_token):
     import datetime
     import json
 
-    now = time.time()
-    my_dict = {}
-    my_dict["unix_time"] = now
-    my_dict["human_time_utc"] = str(datetime.datetime.utcfromtimestamp(int(now))) + " UTC"
-    my_dict["ranks"] = []
-    my_dict["vanity_names"] = []
-    my_dict["claim_ids"] = []
-    my_dict["subscribers"] = []
-
     vanity_names = []
     claim_ids = []
     subscribers = []
@@ -167,6 +158,15 @@ def subscriber_counts(auth_token):
     subscribers = np.array(subscribers)[indices]
 
     # Put the top 100 into the dict
+    now = time.time()
+    my_dict = {}
+    my_dict["unix_time"] = now
+    my_dict["human_time_utc"] = str(datetime.datetime.utcfromtimestamp(int(now))) + " UTC"
+    my_dict["ranks"] = []
+    my_dict["vanity_names"] = []
+    my_dict["claim_ids"] = []
+    my_dict["subscribers"] = []
+
     for i in range(100):
         my_dict["ranks"].append(i+1)
         my_dict["vanity_names"].append(vanity_names[i])
