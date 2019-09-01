@@ -116,7 +116,19 @@ def subscriber_counts(auth_token):
     exists which lists all channels with their name and claim_id.
     """
 
+    import json
     import sqlite3
+
+    # Open previous JSON
+    f = open("subscriber_counts.json")
+    old = json.load(f)
+    f.close()
+
+    # Create a dict from the old JSON, where the claim_id can return
+    # the subscribers and the rank
+    old_dict = {}
+    for i in range(len(old["ranks"])):
+        old_dict[old["claim_ids"][i]] = (old["subscribers"][i], old["ranks"][i])
 
     # Open claims.db
     db_file = "/home/brewer/local/lbry-sdk/lbry/lbryum-data/claims.db"
@@ -188,16 +200,33 @@ def subscriber_counts(auth_token):
     my_dict = {}
     my_dict["unix_time"] = now
     my_dict["human_time_utc"] = str(datetime.datetime.utcfromtimestamp(int(now))) + " UTC"
+    my_dict["old_unix_time"] = old["unix_time"]
+    my_dict["old_human_time_utc"] = old["human_time_utc"]
     my_dict["ranks"] = []
     my_dict["vanity_names"] = []
     my_dict["claim_ids"] = []
     my_dict["subscribers"] = []
+    my_dict["change"] = []
+    my_dict["rank_change"] = []
 
     for i in range(100):
         my_dict["ranks"].append(i+1)
         my_dict["vanity_names"].append(vanity_names[i])
         my_dict["claim_ids"].append(claim_ids[i])
         my_dict["subscribers"].append(int(subscribers[i]))
+
+        # Compute subscribers change
+        my_dict["change"].append(np.nan)
+        my_dict["rank_change"].append(np.nan)
+        try:
+            my_dict["change"][-1] = int(subscribers[i]) - \
+                                        old_dict[claim_ids[i]][0]
+            my_dict["rank_change"][-1] = old_dict[claim_ids[i]][1] - \
+                                         int(ranks[-1])
+
+        except:
+            pass
+
 
     f = open("subscriber_counts.json", "w")
     f.write(json.dumps(my_dict))
