@@ -116,40 +116,64 @@ def subscriber_counts(auth_token):
     exists which lists all channels with their name and claim_id.
     """
 
-    import pandas as pd
+    import sqlite3
 
-    # Assumes channels.csv exists with columns claim_name, claim_id, and
-    # creation_timestamp. Get this from claims.db using the following in
-    # SQLITE3.
-    # sqlite> .output channels.csv
-    # sqlite> select claim_name, claim_id, creation_timestamp from claim where claim_type = 2;
-    channels = pd.read_csv("channels.csv", header=None, sep="|")
-
-    # Sort into alphabetical order
-    indices = np.arange(0, channels.shape[0])
-    indices = sorted(indices, key=lambda i: channels.iloc[i, 0].lower())
-    channels = channels.iloc[indices, :]
-
-    import datetime
-    import json
-
+    # Open claims.db
+    db_file = "/home/brewer/local/lbry-sdk/lbry/lbryum-data/claims.db"
+    conn = sqlite3.connect(db_file)
+    c = conn.cursor()
+    query = "select claim_name, claim_id from claim where claim_type = 2;"
     vanity_names = []
     claim_ids = []
     subscribers = []
-    for i in range(channels.shape[0]):
+
+    # Iterate over query results
+    i = 0
+    for row in c.execute(query):
+        vanity_names.append(row[0])
+        claim_ids.append(row[1])
+        i = i + 1
+    conn.close()
+    vanity_names = np.array(vanity_names)
+    claim_ids = np.array(claim_ids)
+
+
+    k = 0
+    while True:
+        """
+        Go in batches of 100
+        """
+        # Cover a certain range of channels
+        start = 100*k
+        end = 100*(k+1)
+        final = end >= len(claim_ids)
+        if final:
+            end = len(claim_ids)
+
+        # Prepare the request to the LBRY API
         url = "https://api.lbry.com/subscription/sub_count?auth_token=" +\
-                    auth_token + "&" +\
-                    "claim_id=" + channels.iloc[i, 1]
+                    auth_token + "&claim_id="
+        for i in range(start, end):
+            url += claim_ids[i] + ","
+        url = url[0:-1] # No final comma
+
+        # Do the request
         try:
             result = requests.get(url)
-            subs = result.json()["data"][0]
         except:
-            subs = 0
+            print("Something went wrong")
+            return
 
-        vanity_names.append(channels.iloc[i, 0])
-        claim_ids.append(channels.iloc[i, 1])
-        subscribers.append(subs)
-        print(vanity_names[-1], claim_ids[-1], subscribers[-1])
+        # Get sub counts from the result and put them in the subscribers list
+        result = result.json()
+        for x in result["data"]:
+            subscribers.append(x)
+            i = len(subscribers)-1
+
+        print("Processed {end} channels.".format(end=end))
+        if final:
+            break
+        k += 1
 
     # Sort by number of subscribers
     indices = np.argsort(subscribers)[::-1]
@@ -158,6 +182,8 @@ def subscriber_counts(auth_token):
     subscribers = np.array(subscribers)[indices]
 
     # Put the top 100 into the dict
+    import datetime
+    import json
     now = time.time()
     my_dict = {}
     my_dict["unix_time"] = now
@@ -176,6 +202,52 @@ def subscriber_counts(auth_token):
     f = open("subscriber_counts.json", "w")
     f.write(json.dumps(my_dict))
     f.close()
+
+
+#    import datetime
+#    import json
+
+#    subscribers = []
+#    for i in range(channels.shape[0]):
+#        url = "https://api.lbry.com/subscription/sub_count?auth_token=" +\
+#                    auth_token + "&" +\
+#                    "claim_id=" + channels.iloc[i, 1]
+#        try:
+#            result = requests.get(url)
+#            subs = result.json()["data"][0]
+#        except:
+#            subs = 0
+
+#        vanity_names.append(channels.iloc[i, 0])
+#        claim_ids.append(channels.iloc[i, 1])
+#        subscribers.append(subs)
+#        print(vanity_names[-1], claim_ids[-1], subscribers[-1])
+
+#    # Sort by number of subscribers
+#    indices = np.argsort(subscribers)[::-1]
+#    vanity_names = np.array(vanity_names)[indices]
+#    claim_ids = np.array(claim_ids)[indices]
+#    subscribers = np.array(subscribers)[indices]
+
+#    # Put the top 100 into the dict
+#    now = time.time()
+#    my_dict = {}
+#    my_dict["unix_time"] = now
+#    my_dict["human_time_utc"] = str(datetime.datetime.utcfromtimestamp(int(now))) + " UTC"
+#    my_dict["ranks"] = []
+#    my_dict["vanity_names"] = []
+#    my_dict["claim_ids"] = []
+#    my_dict["subscribers"] = []
+
+#    for i in range(100):
+#        my_dict["ranks"].append(i+1)
+#        my_dict["vanity_names"].append(vanity_names[i])
+#        my_dict["claim_ids"].append(claim_ids[i])
+#        my_dict["subscribers"].append(int(subscribers[i]))
+
+#    f = open("subscriber_counts.json", "w")
+#    f.write(json.dumps(my_dict))
+#    f.close()
 
 
 def view_counts(channel_name, auth_token, include_abandoned=False):
