@@ -187,8 +187,15 @@ def subscriber_counts(auth_token):
             break
         k += 1
 
-    # Sort by number of subscribers
-    indices = np.argsort(subscribers)[::-1]
+    # Sort by number of subscribers then by vanity name.
+    # Zip subs with name
+    s_n = []
+    indices = []
+    for i in range(len(vanity_names)):
+        s_n.append((subscribers[i], vanity_names[i]))
+        indices.append(i)
+    indices = sorted(indices, key=lambda x: (s_n[x][0], s_n[x][1]))[::-1]
+
     vanity_names = np.array(vanity_names)[indices]
     claim_ids = np.array(claim_ids)[indices]
     subscribers = np.array(subscribers)[indices]
@@ -222,8 +229,7 @@ def subscriber_counts(auth_token):
             my_dict["change"][-1] = int(subscribers[i]) - \
                                         old_dict[claim_ids[i]][0]
             my_dict["rank_change"][-1] = old_dict[claim_ids[i]][1] - \
-                                         int(ranks[-1])
-
+                                            int(my_dict["ranks"][-1])
         except:
             pass
 
