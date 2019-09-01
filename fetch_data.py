@@ -204,51 +204,6 @@ def subscriber_counts(auth_token):
     f.close()
 
 
-#    import datetime
-#    import json
-
-#    subscribers = []
-#    for i in range(channels.shape[0]):
-#        url = "https://api.lbry.com/subscription/sub_count?auth_token=" +\
-#                    auth_token + "&" +\
-#                    "claim_id=" + channels.iloc[i, 1]
-#        try:
-#            result = requests.get(url)
-#            subs = result.json()["data"][0]
-#        except:
-#            subs = 0
-
-#        vanity_names.append(channels.iloc[i, 0])
-#        claim_ids.append(channels.iloc[i, 1])
-#        subscribers.append(subs)
-#        print(vanity_names[-1], claim_ids[-1], subscribers[-1])
-
-#    # Sort by number of subscribers
-#    indices = np.argsort(subscribers)[::-1]
-#    vanity_names = np.array(vanity_names)[indices]
-#    claim_ids = np.array(claim_ids)[indices]
-#    subscribers = np.array(subscribers)[indices]
-
-#    # Put the top 100 into the dict
-#    now = time.time()
-#    my_dict = {}
-#    my_dict["unix_time"] = now
-#    my_dict["human_time_utc"] = str(datetime.datetime.utcfromtimestamp(int(now))) + " UTC"
-#    my_dict["ranks"] = []
-#    my_dict["vanity_names"] = []
-#    my_dict["claim_ids"] = []
-#    my_dict["subscribers"] = []
-
-#    for i in range(100):
-#        my_dict["ranks"].append(i+1)
-#        my_dict["vanity_names"].append(vanity_names[i])
-#        my_dict["claim_ids"].append(claim_ids[i])
-#        my_dict["subscribers"].append(int(subscribers[i]))
-
-#    f = open("subscriber_counts.json", "w")
-#    f.write(json.dumps(my_dict))
-#    f.close()
-
 
 def view_counts(channel_name, auth_token, include_abandoned=False):
 
