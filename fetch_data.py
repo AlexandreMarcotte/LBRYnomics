@@ -121,7 +121,7 @@ def subscriber_counts(auth_token):
     # Assumes channels.csv exists with columns claim_name, claim_id, and
     # creation_timestamp. Get this from claims.db using the following in
     # SQLITE3.
-    # sqlite> .output channels.svg
+    # sqlite> .output channels.csv
     # sqlite> select claim_name, claim_id, creation_timestamp from claim where claim_type = 2;
     channels = pd.read_csv("channels.csv", header=None, sep="|")
 
@@ -130,8 +130,21 @@ def subscriber_counts(auth_token):
     indices = sorted(indices, key=lambda i: channels.iloc[i, 0].lower())
     channels = channels.iloc[indices, :]
 
-    f = open("sub_counts.csv", "w")
-    f.write("vanity_name,claim_id,creation_timestamp,subscribers\n")
+    import datetime
+    import json
+
+    now = time.time()
+    my_dict = {}
+    my_dict["unix_time"] = now
+    my_dict["human_time_utc"] = str(datetime.datetime.utcfromtimestamp(int(now))) + " UTC"
+    my_dict["ranks"] = []
+    my_dict["vanity_names"] = []
+    my_dict["claim_ids"] = []
+    my_dict["subscribers"] = []
+
+    vanity_names = []
+    claim_ids = []
+    subscribers = []
     for i in range(channels.shape[0]):
         url = "https://api.lbry.com/subscription/sub_count?auth_token=" +\
                     auth_token + "&" +\
@@ -142,10 +155,28 @@ def subscriber_counts(auth_token):
         except:
             subs = 0
 
-        f.write(channels.iloc[i, 0] + "," + channels.iloc[i, 1] + ",")
-        f.write(str(channels.iloc[i, 2]) + "," + str(subs) + "\n")
-        f.flush()
+        vanity_names.append(channels.iloc[i, 0])
+        claim_ids.append(channels.iloc[i, 1])
+        subscribers.append(subs)
+        print(vanity_names[-1], claim_ids[-1], subscribers[-1])
+
+    # Sort by number of subscribers
+    indices = np.argsort(subscribers)[::-1]
+    vanity_names = np.array(vanity_names)[indices]
+    claim_ids = np.array(claim_ids)[indices]
+    subscribers = np.array(subscribers)[indices]
+
+    # Put the top 100 into the dict
+    for i in range(100):
+        my_dict["ranks"].append(i+1)
+        my_dict["vanity_names"].append(vanity_names[i])
+        my_dict["claim_ids"].append(claim_ids[i])
+        my_dict["subscribers"].append(int(subscribers[i]))
+
+    f = open("subscriber_counts.json", "w")
+    f.write(json.dumps(my_dict))
     f.close()
+
 
 def view_counts(channel_name, auth_token, include_abandoned=False):
 
