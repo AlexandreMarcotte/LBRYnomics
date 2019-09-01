@@ -296,6 +296,24 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
         amounts.append(float(the_dict["data"][i]["amount"]))
         times.append(float(the_dict["data"][i]["time"]) + rng.rand())
 
+
+    # Get tips sent to channel itself
+    query = "SELECT support.id as support_id, support.support_amount amount, transaction.transaction_time time\
+                FROM claim\
+                INNER JOIN support ON support.supported_claim_id = claim.claim_id\
+                INNER JOIN transaction ON support.transaction_hash_id = transaction.hash\
+                INNER JOIN output ON transaction.hash = output.transaction_hash \
+                WHERE support.supported_claim_id = '" + channel_claim_id + "'\
+                  AND output.address_list LIKE CONCAT('%25', claim_address, '%25')\
+                  AND transaction.hash <> 'e867afabfa52bea6d5af84e65865dd5d0382c340646f1578192768033be48924'\
+                GROUP BY support.id, support.support_amount, support.created_at"
+
+    request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
+    the_dict = request.json()
+    for i in range(len(the_dict["data"])):
+        amounts.append(float(the_dict["data"][i]["amount"]))
+        times.append(float(the_dict["data"][i]["time"]) + rng.rand())
+
     amounts = np.array(amounts)
     times = np.array(times)
 
