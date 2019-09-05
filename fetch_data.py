@@ -209,6 +209,8 @@ def subscriber_counts(auth_token):
     my_dict["human_time_utc"] = str(datetime.datetime.utcfromtimestamp(int(now))) + " UTC"
     my_dict["old_unix_time"] = old["unix_time"]
     my_dict["old_human_time_utc"] = old["human_time_utc"]
+    my_dict["interval_days"] = np.round((my_dict["unix_time"]\
+                                        - my_dict["old_unix_time"])/86400.0, 2)
     my_dict["ranks"] = []
     my_dict["vanity_names"] = []
     my_dict["claim_ids"] = []
