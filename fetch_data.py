@@ -260,37 +260,57 @@ def view_counts(channel_name, auth_token, include_abandoned=False):
     if not include_abandoned:
         query += "AND bid_state <> 'Spent'"
     query += "ORDER BY release_time, created_at ASC;"
-
-
-
-    query += "ORDER BY transaction_time ASC;"
     request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
     the_dict = request.json()
+
+    claim_ids = []
+    names = []
+    for row in the_dict["data"]:
+        claim_ids.append(row["claim_id"])
+        names.append(row["name"])
 
     view_counts = {}
     tot = 0
     view_counts_list = []
-    for i in range(len(the_dict["data"])):
-        claim_id = the_dict["data"][i]["claim_id"]
+
+    k = 0
+    while True:
+        """
+        Go in batches of 100
+        """
+        # Cover a batch of claims
+        start = 100*k
+        end = 100*(k+1)
+        final = end >= len(claim_ids)
+        if final:
+            end = len(claim_ids)
+
         url = "https://api.lbry.com/file/view_count?auth_token=" + auth_token + \
                     "&" +\
-                    "claim_id=" + claim_id
-        result = requests.get(url)
+                    "claim_id="
+        for i in range(start, end):
+            url += claim_ids[i] + ","
+        url = url[0:-1] # Remove final comma
 
-        name = str(the_dict["data"][i]["name"])
-        views = result.json()["data"][0]
-        view_counts[name] = views
-        view_counts_list.append(views)
-        tot += views
-        message = "Claim {k}/{n} with name \""\
-                    + name + "\" has {v} views."
-        print(message.format(k=i+1,
-                n=len(the_dict["data"]), v=views),
-                flush=True)
+        result = requests.get(url)
+        result = result.json()
+        for i in range(start, end):
+            views = result["data"][i-start]
+            view_counts_list.append(views)
+            view_counts[names[i]] = views
+            message = "Claim {j}/{n} with name \""\
+                        + names[i] + "\" has {v} views."
+            print(message.format(j=i+1,
+                    n=len(claim_ids), v=views),
+                    flush=True)
+
+        if final:
+            break
+        k += 1
 
     return { "view_counts": view_counts,
              "view_counts_vector": np.array(view_counts_list),
-             "total_views": tot,
+             "total_views": np.sum(view_counts_list),
              "subscribers": subscribers }
 
 
