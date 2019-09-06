@@ -301,7 +301,7 @@ def view_counts(channel_name, auth_token, include_abandoned=False):
             view_counts_list.append(views)
             view_counts[names[i]] = views
             message = "Claim {j}/{n} with name \""\
-                        + names[i] + "\" has {v} views."
+                        + str(names[i]) + "\" has {v} views."
             print(message.format(j=i+1,
                     n=len(claim_ids), v=views),
                     flush=True)
