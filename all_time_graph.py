@@ -89,8 +89,13 @@ def make_graph(mode, show=True):
     plt.title("Total number of {mode} = {n}.".format(n=len(times), mode=mode))
     plt.xlim([0.0, days.max() + 1])
     plt.ylim(bottom=-100)
-    plt.gca().grid(True)
+#    plt.gca().grid(True)
     plt.gca().tick_params(labelright=True)
+
+    # Add vertical lines for new years (approximately)
+    new_years = np.arange(0, 5)*365.2425
+    for year in new_years:
+        plt.axvline(year, color="r", alpha=0.2, linestyle="--")
 
     plt.subplot(2, 1, 2)
     bin_width = 1.0
@@ -120,8 +125,12 @@ def make_graph(mode, show=True):
     plt.title("Recent average rate (last 30 days) = {n} {mode} per day.".\
                 format(n=int(np.sum(time.time() - times <= 30.0*86400.0)/30.0),
                        mode=mode))
-    plt.gca().grid(True)
+#    plt.gca().grid(True)
     plt.gca().tick_params(labelright=True)
+    for year in new_years:
+        plt.axvline(year, color="r", alpha=0.2, linestyle="--")
+
+
     #        plt.gca().set_yticks([1.0, 10.0, 100.0, 1000.0, 10000.0])
     #        plt.gca().set_yticklabels(["1", "10", "100", "1000", "10000"])
     plt.legend()
