@@ -225,8 +225,8 @@ def subscriber_counts(auth_token):
         my_dict["subscribers"].append(int(subscribers[i]))
 
         # Compute subscribers change
-        my_dict["change"].append(np.nan)
-        my_dict["rank_change"].append(np.nan)
+        my_dict["change"].append(None)
+        my_dict["rank_change"].append(None)
         try:
             my_dict["change"][-1] = int(subscribers[i]) - \
                                         old_dict[claim_ids[i]][0]
