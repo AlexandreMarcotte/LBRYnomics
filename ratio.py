@@ -1,6 +1,10 @@
 # Silly script to estimate ratio from logfile
 directory = "/home/brewer/.local/share/lbry/lbrynet"
 
+# Remove trailing slash if one was given
+if directory[-1] == "/":
+    directory = directory[0:-1]
+
 suffices = ["", ".1", ".2", ".3", ".4", ".5"]
 # Blob counts
 up = 0
