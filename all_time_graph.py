@@ -19,6 +19,7 @@ def make_graph(mode, show=True):
         return
 
     plt.close("all")
+    plt.style.use('dark_background')
 
     # Open the DB
     db_file = "/home/brewer/local/lbry-sdk/lbry/lbryum-data/claims.db"
@@ -84,7 +85,7 @@ def make_graph(mode, show=True):
     times_in_days = (times - 1483228800)/86400.0
     days = times_in_days.astype("int64")
     plt.plot(times_in_days,
-                np.arange(len(times)), "k-", linewidth=1.5)
+                np.arange(len(times)), "w-", linewidth=1.5)
     plt.ylabel("Cumulative number of {mode}".format(mode=mode))
     plt.title("Total number of {mode} = {n}.".format(n=len(times), mode=mode))
     plt.xlim([0.0, days.max() + 1])
@@ -95,7 +96,7 @@ def make_graph(mode, show=True):
     # Add vertical lines for new years (approximately)
     new_years = np.arange(0, 5)*365.2425
     for year in new_years:
-        plt.axvline(year, color="r", alpha=0.2, linestyle="--")
+        plt.axvline(year, color="r", alpha=0.8, linestyle="--")
 
     plt.subplot(2, 1, 2)
     bin_width = 1.0
@@ -105,7 +106,7 @@ def make_graph(mode, show=True):
     color = "g"
     if mode == "channels":
         color="b"
-    counts = plt.hist(days, bins, alpha=0.5, color=color, label="Raw",
+    counts = plt.hist(days, bins, alpha=0.9, color=color, label="Raw",
                         width=bin_width, align="mid")[0]
 
     # Compute 10-day moving average
@@ -115,7 +116,7 @@ def make_graph(mode, show=True):
         if len(subset) >= 10:
             subset = subset[-10:]
         moving_average[i] = np.mean(subset)
-    plt.plot(bins[0:-2] + 0.5*bin_width, moving_average[0:-1], "k-",
+    plt.plot(bins[0:-2] + 0.5*bin_width, moving_average[0:-1], "w-",
                 label="10-day moving average", linewidth=1.5)
     #        plt.gca().set_yscale("log")
     plt.xlim([0.0, days.max() + 1])
@@ -128,7 +129,7 @@ def make_graph(mode, show=True):
 #    plt.gca().grid(True)
     plt.gca().tick_params(labelright=True)
     for year in new_years:
-        plt.axvline(year, color="r", alpha=0.2, linestyle="--")
+        plt.axvline(year, color="r", alpha=0.8, linestyle="--")
 
 
     #        plt.gca().set_yticks([1.0, 10.0, 100.0, 1000.0, 10000.0])
