@@ -76,9 +76,9 @@ def make_graph(mode, show=True):
 
 
     # Plotting stuff
-    plt.rcParams["font.family"] = "serif"
+    plt.rcParams["font.family"] = "Liberation Sans"
     plt.rcParams["font.size"] = 14
-    plt.rc("text", usetex=True)
+#    plt.rc("text", usetex=True)
 
     plt.figure(figsize=(15, 11))
     plt.subplot(2, 1, 1)
