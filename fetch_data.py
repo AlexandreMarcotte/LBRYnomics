@@ -110,7 +110,7 @@ def view_count(url, auth_token):
     result = requests.get(url)
     return result.json()["data"][0]
 
-def subscriber_counts(auth_token):
+def subscriber_counts(auth_token, preview=False):
     """
     Get subscriber counts for all channels. Assumes a file output.csv
     exists which lists all channels with their name and claim_id.
@@ -235,8 +235,10 @@ def subscriber_counts(auth_token):
         except:
             pass
 
-
-    f = open("subscriber_counts.json", "w")
+    if preview:
+        f = open("subscriber_counts_preview.txt", "w")
+    else:
+        f = open("subscriber_counts.json", "w")
     f.write(json.dumps(my_dict))
     f.close()
 
