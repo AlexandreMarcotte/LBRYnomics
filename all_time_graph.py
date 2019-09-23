@@ -19,7 +19,6 @@ def make_graph(mode, show=True):
         return
 
     plt.close("all")
-    plt.style.use('dark_background')
 
     # Open the DB
     db_file = "/home/brewer/local/lbry-sdk/lbry/lbryum-data/claims.db"
@@ -78,7 +77,9 @@ def make_graph(mode, show=True):
     # Plotting stuff
     plt.rcParams["font.family"] = "Liberation Sans"
     plt.rcParams["font.size"] = 14
-#    plt.rc("text", usetex=True)
+    plt.style.use("dark_background")
+    plt.rcParams["axes.facecolor"] = "#3c3d3c"
+    plt.rcParams["savefig.facecolor"] = "#3c3d3c"
 
     plt.figure(figsize=(15, 11))
     plt.subplot(2, 1, 1)
@@ -103,9 +104,9 @@ def make_graph(mode, show=True):
 
     # Bin edges including right edge of last bin
     bins = np.arange(0, np.max(days)+2) - 0.5*bin_width
-    color = "g"
-    if mode == "channels":
-        color="b"
+    color = "#6b95ef"
+#    if mode == "channels":
+#        color="b"
     counts = plt.hist(days, bins, alpha=0.9, color=color, label="Raw",
                         width=bin_width, align="mid")[0]
 
@@ -137,7 +138,8 @@ def make_graph(mode, show=True):
     plt.legend()
 
     plt.savefig("{mode}.svg".format(mode=mode), bbox_inches="tight")
-    print("Figure saved to {mode}.svg.".format(mode=mode))
+    plt.savefig("{mode}.png".format(mode=mode), bbox_inches="tight", dpi=70)
+    print("Figure saved to {mode}.svg and {mode}.png.".format(mode=mode))
     if show:
         plt.show()
 
