@@ -410,6 +410,9 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
     t_end /= 2629800.0
     times /= 2629800.0
 
+    # Version where 0 = current time
+    _times = times - t_end
+
     # Save to a YAML file
     filename = "Data/" + channel_name + ".yaml"
     f = open(filename, "w")
@@ -445,11 +448,11 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
 
         plt.figure(figsize=(10, 5))
         for i in range(len(amounts)):
-            plt.plot([times[i], times[i]], [0.0, amounts[i]], "b-", alpha=0.2)
+            plt.plot([_times[i], _times[i]], [0.0, amounts[i]], "b-", alpha=0.2)
         plt.ylim(bottom=0.0)
-        t_range = t_end - t_start
-        plt.xlim(t_start - 0.01*t_range, t_end)
-        plt.xlabel("Time (unix time, months)", fontsize=12)
+        t_range = _times.max() - _times.min()
+        plt.xlim(_times.min() - 0.01*t_range, 0.0)
+        plt.xlabel("Time (months)", fontsize=12)
         plt.ylabel("Tip amount (LBC)", fontsize=12)
         plt.title("Tip history for " + channel_name.replace("#", "\#") +\
                     ". Total = {tot} LBC."\
