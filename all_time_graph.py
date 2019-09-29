@@ -202,7 +202,7 @@ def aggregate_tips():
         result["num_tips_{label}".format(label=labels[i])] = len(_tips)
         result["lbc_tipped_{label}".format(label=labels[i])] = float(_tips.sum())
         maxtip = 0
-        maxtip_link = "null"
+        maxtip_link = None
         if len(_tips) > 0:
             maxtip = float(_tips.max())
             index = np.argmax(_tips)
@@ -219,7 +219,7 @@ def aggregate_tips():
         result["num_supports_{label}".format(label=labels[i])] = len(_tips)
         result["lbc_supports_{label}".format(label=labels[i])] = float(_tips.sum())
         maxtip = 0
-        maxtip_link = "null"
+        maxtip_link = None
         if len(_tips) > 0:
             maxtip = float(_tips.max())
             index = np.argmax(_tips)
