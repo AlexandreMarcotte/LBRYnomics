@@ -158,8 +158,8 @@ def aggregate_tips():
     result["human_time_utc"] = str(datetime.datetime.utcfromtimestamp(int(now))) + " UTC"
 
     # Agrees with old method, but should it be SUM(amount)?
-    query = "SELECT support_id, amount, time, claim_name, claim_id, SUM(to_claim_address) tot FROM (SELECT support.id as support_id, support.support_amount amount,\
-                            transaction.transaction_time time,\
+    query = "SELECT support_id, amount, time, claim_name, claim_id, is_nsfw, SUM(to_claim_address) tot FROM (SELECT support.id as support_id, support.support_amount amount,\
+                            transaction.transaction_time time, claim.is_nsfw is_nsfw,\
                             claim.claim_id claim_id, claim.name claim_name,\
                             (CASE WHEN (output.address_list LIKE CONCAT('%25', claim_address, '%25')) THEN '1' ELSE '0' END) to_claim_address\
                 FROM claim\
@@ -178,11 +178,13 @@ def aggregate_tips():
     tips = []
     is_tip = []
     links = []
+    is_nsfw = []
     for row in the_dict["data"]:
         times.append(float(row["time"]))
         tips.append(float(row["amount"]))
         links.append("https://open.lbry.com/" + str(row["claim_name"]) + ":"\
                             + str(row["claim_id"]))
+        is_nsfw.append(row["is_nsfw"])
         if row["tot"] > 0:
             is_tip.append(True)
         else:
@@ -192,6 +194,7 @@ def aggregate_tips():
     tips = np.array(tips)
     is_tip = np.array(is_tip)
     links = np.array(links)
+    is_nsfw = np.array(is_nsfw)
 
     # Write tips
     for i in range(len(labels)):
@@ -199,16 +202,20 @@ def aggregate_tips():
         _times = times[keep]
         _tips = tips[keep]
         _links = links[keep]
+        _is_nsfw = is_nsfw[keep]
         result["num_tips_{label}".format(label=labels[i])] = len(_tips)
         result["lbc_tipped_{label}".format(label=labels[i])] = float(_tips.sum())
         maxtip = 0
         maxtip_link = None
+        maxtip_is_nsfw = None
         if len(_tips) > 0:
             maxtip = float(_tips.max())
             index = np.argmax(_tips)
-            maxtip_link = _links[index]            
+            maxtip_link = _links[index]
+            maxtip_is_nsfw = _is_nsfw[index]
         result["biggest_tip_{label}".format(label=labels[i])] = maxtip
         result["biggest_tip_{label}_link".format(label=labels[i])] = maxtip_link
+        result["biggest_tip_{label}_is_nsfw".format(label=labels[i])] = int(maxtip_is_nsfw)
 
     # Write supports
     for i in range(len(labels)):
@@ -216,16 +223,20 @@ def aggregate_tips():
         _times = times[keep]
         _tips = tips[keep]
         _links = links[keep]
+        _is_nsfw = is_nsfw[keep]
         result["num_supports_{label}".format(label=labels[i])] = len(_tips)
         result["lbc_supports_{label}".format(label=labels[i])] = float(_tips.sum())
         maxtip = 0
         maxtip_link = None
+        maxtip_is_nsfw = None
         if len(_tips) > 0:
             maxtip = float(_tips.max())
             index = np.argmax(_tips)
             maxtip_link = _links[index]
+            maxtip_is_nsfw = _is_nsfw[index]
         result["biggest_support_{label}".format(label=labels[i])] = maxtip
         result["biggest_support_{label}_link".format(label=labels[i])] = maxtip_link
+        result["biggest_support_{label}_is_nsfw".format(label=labels[i])] = int(maxtip_is_nsfw)
 
     f = open("tips_stats.json", "w")
     f.write(json.dumps(result))
