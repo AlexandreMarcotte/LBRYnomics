@@ -134,7 +134,7 @@ def subscriber_counts(auth_token, preview=False):
     db_file = "/home/brewer/local/lbry-sdk/lbry/lbryum-data/claims.db"
     conn = sqlite3.connect(db_file)
     c = conn.cursor()
-    query = "select claim_name, claim_id from claim where claim_type = 2;"
+    query = "select claim_name, claim_id, claim_hash from claim where claim_type = 2;"
     vanity_names = []
     claim_ids = []
     subscribers = []
@@ -145,7 +145,7 @@ def subscriber_counts(auth_token, preview=False):
         vanity_names.append(row[0])
         claim_ids.append(row[1])
         i = i + 1
-    conn.close()
+
     vanity_names = np.array(vanity_names)
     claim_ids = np.array(claim_ids)
 
@@ -217,12 +217,14 @@ def subscriber_counts(auth_token, preview=False):
     my_dict["subscribers"] = []
     my_dict["change"] = []
     my_dict["rank_change"] = []
+    my_dict["is_nsfw"] = []
 
     for i in range(100):
         my_dict["ranks"].append(i+1)
         my_dict["vanity_names"].append(vanity_names[i])
         my_dict["claim_ids"].append(claim_ids[i])
         my_dict["subscribers"].append(int(subscribers[i]))
+        my_dict["is_nsfw"].append(False)
 
         # Compute subscribers change
         my_dict["change"].append(None)
@@ -235,12 +237,22 @@ def subscriber_counts(auth_token, preview=False):
         except:
             pass
 
+        # Do SQL queries to see if there's a mature tag
+        query = "SELECT tag.tag FROM claim INNER JOIN tag ON tag.claim_hash = claim.claim_hash WHERE claim_id = '"
+        query += claim_ids[i] + "';"
+
+        for row in c.execute(query):
+            if row[0].lower() == "mature":
+                my_dict["is_nsfw"][-1] = True
+
     if preview:
         f = open("subscriber_counts_preview.txt", "w")
     else:
         f = open("subscriber_counts.json", "w")
     f.write(json.dumps(my_dict))
     f.close()
+
+    conn.close()
 
 
 
