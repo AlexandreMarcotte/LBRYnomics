@@ -215,7 +215,7 @@ def aggregate_tips():
             maxtip_is_nsfw = _is_nsfw[index]
         result["biggest_tip_{label}".format(label=labels[i])] = maxtip
         result["biggest_tip_{label}_link".format(label=labels[i])] = maxtip_link
-        result["biggest_tip_{label}_is_nsfw".format(label=labels[i])] = int(maxtip_is_nsfw)
+        result["biggest_tip_{label}_is_nsfw".format(label=labels[i])] = bool(maxtip_is_nsfw)
 
     # Write supports
     for i in range(len(labels)):
