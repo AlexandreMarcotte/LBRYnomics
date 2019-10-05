@@ -21,9 +21,9 @@ for suffix in suffices:
         f = open(filename)
         lines = f.readlines()
         for line in lines:
-            if "lbry.blob_exchange.server:105: sent" in line:
+            if "lbry.blob_exchange.server:" and "sent" in line:
                 up += 1
-            if "lbry.blob_exchange.client:159: downloaded" in line:
+            if "lbry.blob_exchange.client:" and "downloaded" in line:
                 down += 1
         f.close()
 
