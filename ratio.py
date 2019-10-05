@@ -1,5 +1,16 @@
-# Silly script to estimate ratio from logfile
-directory = "/home/brewer/.local/share/lbry/lbrynet"
+#!/usr/bin/env python
+"""
+Silly script to estimate recent LBRY ratio from logfiles
+"""
+
+# This should work on Linux. On other OSs you can try
+# just setting the directory string yourself.
+# You might need escape characters. E.g. on windows
+# it could be something like
+# directory = "C:/Program\ Files/..."
+from os.path import expanduser
+home = expanduser("~")
+directory = home + "/.local/share/lbry/lbrynet"
 
 # Remove trailing slash if one was given
 if directory[-1] == "/":
