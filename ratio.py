@@ -46,5 +46,5 @@ print("Success = {success}.".format(success=success))
 if success:
     print("Downloaded {down} blobs.".format(down=down))
     print("Uploaded {up} blobs.".format(up=up))
-    print("Ratio = {ratio}.".format(ratio=up/down))
+    print("Ratio = {ratio}.".format(ratio=float(up)/down))
 
