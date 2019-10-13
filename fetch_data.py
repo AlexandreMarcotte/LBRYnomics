@@ -219,8 +219,7 @@ def subscriber_counts(auth_token, preview=False):
     my_dict["rank_change"] = []
     my_dict["is_nsfw"] = []
 
-    grey_list = ["2220267092172632beb2032793bf9b62ed909d97",
-                 "f24ab6f03d96aada87d4e14b2dac4aa1cee8d787"]
+    grey_list = ["f24ab6f03d96aada87d4e14b2dac4aa1cee8d787"]
 
     for i in range(100):
         my_dict["ranks"].append(i+1)
