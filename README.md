@@ -1,16 +1,12 @@
 LBRYnomics
 ==========
 
-This was initially going to be about Bayesian forecasting of [LBRY](https://api.lbry.io/user/refer?r=9pa98r9uUUFgJ4JpVr1YvH5dMEbXNTvo) tips*
-but it's since evolved into an arbitrary collection of Python scripts that do various things like
-continuously publishing the stuff at https://www.brendonbrewer.com/lbrynomics.
-The forecasting aspect is abandoned until the team stops destroying my assumptions and
-things settle into some sort of equilibrium. :-)
+This was initially going to be about Bayesian forecasting of LBRY tips,
+but it's since evolved into an arbitrary collection of Python scripts that do various things, including continually scraping and publishing data the [LBRYnomics page on LBRY Social](https://lbry.social/lbrynomics).
+
+It's not user friendly and you probably shouldn't try to use it, but if you really want to, [get in touch](https://www.brendonbrewer.com/contact.html). I might be persuaded to make a proper package out of it.
 
 (c) 2019 Brendon J. Brewer. LICENCE: MIT.
-
-\* Full disclosure: That's a referral link and
-    I'll get a little reward if you install the LBRY app. But so will you.
 
 <!--Dependencies:-->
 
