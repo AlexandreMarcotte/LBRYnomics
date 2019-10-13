@@ -2,15 +2,9 @@ LBRYnomics
 ==========
 
 This was initially going to be about Bayesian forecasting of LBRY tips,
-but it's since evolved into an arbitrary collection of Python scripts that do various things, including continually scraping and publishing data the [LBRYnomics page on LBRY Social](https://lbry.social/lbrynomics).
-
-It's not user friendly and you probably shouldn't try to use it, but if you really want to, [get in touch](https://www.brendonbrewer.com/contact.html). I might be persuaded to make a proper package out of it.
+but it's since evolved into an arbitrary collection of Python scripts that do various things, including continually scraping and publishing data the [LBRYnomics page on LBRY Social](https://lbry.social/lbrynomics). It's not user friendly and you probably shouldn't try to use it, but if you really want to, [get in touch](https://www.brendonbrewer.com/contact.html). I might be persuaded to make a proper package out of it.
 
 (c) 2019 Brendon J. Brewer. LICENCE: MIT.
-
-While you're here, here is a live-ish (updated about every 10 minutes) plot of the total amount of content on LBRY:
-
-![claims.png](https://brendonbrewer.com/lbrynomics/claims.png)
 
 <!--Dependencies:-->
 
