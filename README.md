@@ -10,7 +10,7 @@ It's not user friendly and you probably shouldn't try to use it, but if you real
 
 While you're here, here is a live-ish (updated about every 10 minutes) plot of the total amount of content on LBRY:
 
-![claims.png][https://brendonbrewer.com/lbrynomics/claims.png]
+![claims.png](https://brendonbrewer.com/lbrynomics/claims.png)
 
 <!--Dependencies:-->
 
