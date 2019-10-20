@@ -110,6 +110,12 @@ def make_graph(mode, show=True):
                     "{text} begins".format(text=year_names[i]),
                     fontsize=10)
 
+    # Add line and text about MH's video
+    plt.axvline(890.0, linestyle="dotted", linewidth=2, color="g")
+    plt.text(890.0, 0.2*plt.gca().get_ylim()[1],
+            "@MH video\n\'Why I Left YouTube\'\ngoes viral",
+            fontsize=10)
+
     plt.subplot(2, 1, 2)
     bin_width = 1.0
 
@@ -138,8 +144,12 @@ def make_graph(mode, show=True):
                        mode=string))
 
     plt.gca().tick_params(labelright=True)
+    # Year lines
     for year in new_years:
         plt.axvline(year, color="r", alpha=0.8, linestyle="--")
+
+    # MH line
+    plt.axvline(890.0, linestyle="dotted", linewidth=2, color="g")
 
 
     #        plt.gca().set_yticks([1.0, 10.0, 100.0, 1000.0, 10000.0])
