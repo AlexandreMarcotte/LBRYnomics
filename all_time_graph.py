@@ -71,7 +71,7 @@ def make_graph(mode, show=True):
     # Count new claims this UTC day
     count_today = np.sum(times > 86400.0*int(now/86400.0))
     if mode == "claims":
-        string = "publishes"
+        string = "publications"
     else:
         string = "channels"
     print("{K} {mode}, {n} from today so far (UTC). ".format(K=len(times), mode=string, n=count_today), end="", flush=True)
