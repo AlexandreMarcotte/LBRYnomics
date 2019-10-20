@@ -71,7 +71,7 @@ def make_graph(mode, show=True):
     # Count new claims this UTC day
     count_today = np.sum(times > 86400.0*int(now/86400.0))
     if mode == "claims":
-        string = "content claims"
+        string = "publishes"
     else:
         string = "channels"
     print("{K} {mode}, {n} from today so far (UTC). ".format(K=len(times), mode=string, n=count_today), end="", flush=True)
@@ -126,7 +126,7 @@ def make_graph(mode, show=True):
     #        plt.gca().set_yscale("log")
     plt.xlim([0.0, days.max() + 1])
     plt.xlabel("Time (days since 2017-01-01)")
-    plt.ylabel("New {mode}s added each day".format(mode=string))
+    plt.ylabel("New {mode} added each day".format(mode=string))
     subset = counts[-31:-1]
     plt.title("Recent average rate (last 30 days) = {n} {mode} per day.".\
                 format(n=int(np.sum(time.time() - times <= 30.0*86400.0)/30.0),
