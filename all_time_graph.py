@@ -95,7 +95,6 @@ def make_graph(mode, show=True):
     plt.title("Total number of {mode} = {n}.".format(n=len(times), mode=string))
     plt.xlim([0.0, days.max() + 1])
     plt.ylim(bottom=-100)
-#    plt.gca().grid(True)
     plt.gca().tick_params(labelright=True)
 
     # Add vertical lines for new years (approximately)
@@ -103,14 +102,20 @@ def make_graph(mode, show=True):
     for year in new_years:
         plt.axvline(year, color="r", alpha=0.8, linestyle="--")
 
+    # Add text about years
+    year_names = [2017, 2018, 2019]
+    for i in range(len(year_names)):
+        year = new_years[i]
+        plt.text(year+5.0, 0.95*plt.gca().get_ylim()[1],
+                    "{text} begins".format(text=year_names[i]),
+                    fontsize=10)
+
     plt.subplot(2, 1, 2)
     bin_width = 1.0
 
     # Bin edges including right edge of last bin
     bins = np.arange(0, np.max(days)+2) - 0.5*bin_width
     color = "#6b95ef"
-#    if mode == "channels":
-#        color="b"
     counts = plt.hist(days, bins, alpha=0.9, color=color, label="Raw",
                         width=bin_width, align="mid")[0]
 
@@ -123,7 +128,7 @@ def make_graph(mode, show=True):
         moving_average[i] = np.mean(subset)
     plt.plot(bins[0:-2] + 0.5*bin_width, moving_average[0:-1], "w-",
                 label="10-day moving average", linewidth=1.5)
-    #        plt.gca().set_yscale("log")
+
     plt.xlim([0.0, days.max() + 1])
     plt.xlabel("Time (days since 2017-01-01)")
     plt.ylabel("New {mode} added each day".format(mode=string))
@@ -131,7 +136,7 @@ def make_graph(mode, show=True):
     plt.title("Recent average rate (last 30 days) = {n} {mode} per day.".\
                 format(n=int(np.sum(time.time() - times <= 30.0*86400.0)/30.0),
                        mode=string))
-#    plt.gca().grid(True)
+
     plt.gca().tick_params(labelright=True)
     for year in new_years:
         plt.axvline(year, color="r", alpha=0.8, linestyle="--")
