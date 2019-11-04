@@ -255,6 +255,8 @@ def subscriber_counts(auth_token, preview=False):
         f = open("subscriber_counts_preview.txt", "w")
     else:
         f = open("subscriber_counts.json", "w")
+        import update_rss
+        update_rss.update(my_dict["human_time_utc"])
     f.write(json.dumps(my_dict))
     f.close()
 
