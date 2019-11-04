@@ -4,6 +4,8 @@ Docs/*.aux
 Docs/*.log
 Docs/*.pdf
 __pycache__
+claims.png
+channels.png
 channels.svg
 claims.svg
 data.yaml
