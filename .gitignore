@@ -4,6 +4,8 @@ Docs/*.aux
 Docs/*.log
 Docs/*.pdf
 __pycache__
+claims.png
+channels.png
 channels.svg
 claims.svg
 data.yaml
@@ -17,3 +19,4 @@ sample.txt
 sample_info.txt
 sampler_state.txt
 weights.txt
+subscriber_counts_preview.txt
