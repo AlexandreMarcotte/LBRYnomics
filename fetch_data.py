@@ -470,7 +470,7 @@ def data_to_yaml(channel_name, yaml_file="data.yaml", plot=False):
         for i in range(len(amounts)):
             plt.plot([_times[i], _times[i]], [0.0, amounts[i]], "b-", alpha=0.2)
         plt.ylim(bottom=0.0)
-        t_range = _times.max() - _times.min()
+        t_range = np.max([_times.max(), 0.0]) - _times.min()
         plt.xlim(_times.min() - 0.01*t_range, 0.0)
         plt.xlabel("Time (months)", fontsize=12)
         plt.ylabel("Tip amount (LBC)", fontsize=12)
