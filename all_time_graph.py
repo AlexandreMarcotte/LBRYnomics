@@ -296,7 +296,7 @@ if __name__ == "__main__":
     import time
     while True:
         print("", flush=True)
-        time.sleep(500.0)
+        time.sleep(530.0)
 
         now = time.time()
         print("The time is " + str(datetime.datetime.utcfromtimestamp(int(now))) + " UTC.")
