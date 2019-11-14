@@ -53,6 +53,7 @@ time.sleep(delay)
 for i in range(reps):
     daemon_command("support create --claim_id=" + claim_id \
                         + " --amount=" + str(float(amount)))
-    time.sleep(6*3600) # Wait six hours
 
+    if i != reps-1:
+        time.sleep(6*3600) # Wait six hours
 
