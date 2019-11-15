@@ -24,7 +24,7 @@ def daemon_command(command, message="Calling lbrynet daemon..."):
 url = input("Enter LBRY URL to boost: ")
 
 # Resolve it to get claim_id
-result = daemon_command("resolve " + url)
+result = daemon_command("resolve " + url, "Resolving URL to get claim_id...")
 
 # Get claim_id
 try:
@@ -43,7 +43,8 @@ reps = int(input("Number of repetitions: "))
 delay = float(input("Delay before first support, in hours (e.g., 0, 1, 2, 3, ...): "))*3600.0
 
 # Check available balance
-balance = float(daemon_command("account balance")["available"])
+balance = float(daemon_command("account balance",
+                               message="Checking available balance...")["available"])
 if amount*reps > balance:
     print("You don't have enough LBC to do this!")
     exit()
@@ -52,7 +53,8 @@ if amount*reps > balance:
 time.sleep(delay)
 for i in range(reps):
     daemon_command("support create --claim_id=" + claim_id \
-                        + " --amount=" + str(float(amount)))
+                        + " --amount=" + str(float(amount)),
+                   message="Depositing support #{k}...".format(k=i+1))
 
     if i != reps-1:
         time.sleep(6*3600) # Wait six hours
