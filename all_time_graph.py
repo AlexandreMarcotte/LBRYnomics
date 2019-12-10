@@ -21,7 +21,7 @@ def make_graph(mode, show=True):
     plt.close("all")
 
     # Open the DB
-    db_file = "/home/brewer/local/lbry-sdk/lbry/lbryum-data/claims.db"
+    db_file = "/home/brewer/local/lbry-sdk/lbry/lbryum_data/claims.db"
     conn = sqlite3.connect(db_file)
     c = conn.cursor()
 
