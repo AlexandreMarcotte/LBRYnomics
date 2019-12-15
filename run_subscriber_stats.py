@@ -18,8 +18,8 @@ while True:
     print("It's been {d} days since the last update."\
                 .format(d=np.round(gap/day, 4)))
 
-    if time.time() - t >= (week - hour):
-        subscriber_counts("") # <- Put auth token there as a string
+    time.sleep(week - gap)
+    subscriber_counts("") # <- Put auth token there as a string
 
     # Check about once every 15 minutes
     time.sleep(0.25*hour)
