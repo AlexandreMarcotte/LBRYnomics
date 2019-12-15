@@ -170,8 +170,8 @@ def aggregate_tips():
     # The SQL query to perform
     now = time.time()
     print("Computing tip stats...", end="", flush=True)
-    labels = ["30_days", "7_days", "24_hours", "1_hour"]
-    windows = [30*86400.0, 7*86400.0, 1*86400.0, 3600.0]
+    labels = ["all_time", "30_days", "7_days", "24_hours", "1_hour"]
+    windows = [None, 30*86400.0, 7*86400.0, 1*86400.0, 3600.0]
     result = {}
     result["unix_time"] = now
     result["human_time_utc"] =\
@@ -187,7 +187,11 @@ def aggregate_tips():
                     MAX(support_amount) max
                 FROM
                     support
-                WHERE
+                """
+
+        if i > 0:
+            query += \
+                """ WHERE
                     created_at > FROM_UNIXTIME({now} - {window})
                 """.format(now=now, window=windows[i])
 
