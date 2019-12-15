@@ -116,6 +116,8 @@ def subscriber_counts(auth_token, preview=False):
     exists which lists all channels with their name and claim_id.
     """
 
+    now = time.time()
+    import datetime
     import json
     import sqlite3
 
@@ -131,7 +133,7 @@ def subscriber_counts(auth_token, preview=False):
         old_dict[old["claim_ids"][i]] = (old["subscribers"][i], old["ranks"][i])
 
     # Open claims.db
-    db_file = "/home/brewer/local/lbry-sdk/lbry/lbryum-data/claims.db"
+    db_file = "/home/brewer/local/lbry-sdk/lbry/lbryum_data/claims.db"
     conn = sqlite3.connect(db_file)
     c = conn.cursor()
     query = "select claim_name, claim_id, claim_hash from claim where claim_type = 2;"
@@ -149,27 +151,27 @@ def subscriber_counts(auth_token, preview=False):
     vanity_names = np.array(vanity_names)
     claim_ids = np.array(claim_ids)
 
-    # Now get number of claims in each channel from chainquery
-    print("Waiting for chainquery...", flush=True, end="")
-    query = "SELECT COUNT(claim_id) num, publisher_id FROM claim\
-                GROUP BY publisher_id\
-                HAVING num > 0;"
-    request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
-    the_dict = request.json()
-    print("done.")
+#    # Now get number of claims in each channel from chainquery
+#    print("Waiting for chainquery...", flush=True, end="")
+#    query = "SELECT COUNT(claim_id) num, publisher_id FROM claim\
+#                GROUP BY publisher_id\
+#                HAVING num > 0;"
+#    request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
+#    the_dict = request.json()
+#    print("done.")
 
-    print("Filtering channel list to exclude those with no publications...", flush=True, end="")
-    claims_with_content = []
-    for row in the_dict["data"]:
-        claims_with_content.append(row["publisher_id"])
-    include = np.zeros(len(claim_ids), dtype=bool)
-    for i in range(len(claim_ids)):
-        include[i] = claim_ids[i] in claims_with_content
-    print("done.")
+#    print("Filtering channel list to exclude those with no publications...", flush=True, end="")
+#    claims_with_content = []
+#    for row in the_dict["data"]:
+#        claims_with_content.append(row["publisher_id"])
+#    include = np.zeros(len(claim_ids), dtype=bool)
+#    for i in range(len(claim_ids)):
+#        include[i] = claim_ids[i] in claims_with_content
+#    print("done.")
 
-    vanity_names = vanity_names[include]
-    claim_ids = claim_ids[include]
-    print("{num} channels remain.".format(num=include.sum()))
+#    vanity_names = vanity_names[include]
+#    claim_ids = claim_ids[include]
+#    print("{num} channels remain.".format(num=include.sum()))
 
 
     k = 0
@@ -223,9 +225,6 @@ def subscriber_counts(auth_token, preview=False):
     subscribers = np.array(subscribers)[indices]
 
     # Put the top 100 into the dict
-    import datetime
-    import json
-    now = time.time()
     my_dict = {}
     my_dict["unix_time"] = now
     my_dict["human_time_utc"] = str(datetime.datetime.utcfromtimestamp(int(now))) + " UTC"
