@@ -21,6 +21,3 @@ while True:
     time.sleep(week - gap)
     subscriber_counts("") # <- Put auth token there as a string
 
-    # Check about once every 15 minutes
-    time.sleep(0.25*hour)
-
