@@ -238,9 +238,10 @@ def publish_files():
 
 
 if __name__ == "__main__":
+
     # Do it manually once then enter the infinite loop
-    now = time.time()
-    print("The time is " + str(datetime.datetime.utcfromtimestamp(int(now))) + " UTC.")
+    start = time.time()
+    print("The time is " + str(datetime.datetime.utcfromtimestamp(int(start))) + " UTC.")
     make_graph("claims")
     make_graph("channels")
     try:
@@ -248,18 +249,20 @@ if __name__ == "__main__":
     except:
         pass
 
-    import os
     try:
         publish_files()
     except:
         pass
-    import time
+    finish = time.time()
+    duration = finish - start
+
+
     while True:
         print("", flush=True)
-        time.sleep(530.0)
+        time.sleep(600.0 - duration)
 
-        now = time.time()
-        print("The time is " + str(datetime.datetime.utcfromtimestamp(int(now))) + " UTC.")
+        start = time.time()
+        print("The time is " + str(datetime.datetime.utcfromtimestamp(int(start))) + " UTC.")
         make_graph("claims", show=False)
         make_graph("channels", show=False)
         try:
@@ -271,4 +274,7 @@ if __name__ == "__main__":
             publish_files()
         except:
             pass
+
+        finish = time.time()
+        duration = finish - start
 
