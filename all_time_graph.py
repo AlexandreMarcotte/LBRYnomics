@@ -174,90 +174,51 @@ def aggregate_tips():
     windows = [30*86400.0, 7*86400.0, 1*86400.0, 3600.0]
     result = {}
     result["unix_time"] = now
-    result["human_time_utc"] = str(datetime.datetime.utcfromtimestamp(int(now))) + " UTC"
+    result["human_time_utc"] =\
+                    str(datetime.datetime.utcfromtimestamp(int(now))) + " UTC"
 
-    # Agrees with old method, but should it be SUM(amount)?
-    query = "SELECT support_id, amount, time, claim_name, claim_id, is_nsfw, SUM(to_claim_address) tot FROM (SELECT support.id as support_id, support.support_amount amount,\
-                            transaction.transaction_time time, claim.is_nsfw is_nsfw,\
-                            claim.claim_id claim_id, claim.name claim_name,\
-                            (CASE WHEN (output.address_list LIKE CONCAT('%25', claim_address, '%25')) THEN '1' ELSE '0' END) to_claim_address\
-                FROM claim\
-                INNER JOIN support ON support.supported_claim_id = claim.claim_id\
-                INNER JOIN transaction ON support.transaction_hash_id = transaction.hash\
-                INNER JOIN output ON transaction.hash = output.transaction_hash \
-                WHERE transaction.transaction_time > ({now} - {window})\
-                      AND transaction.transaction_time <= {now}) AS result\
-                GROUP BY support_id, amount;".format(now=now, window=windows[0])
-
-    request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
-    the_dict = request.json()
-
-    # Get tips into numpy array
-    times = []
-    tips = []
-    is_tip = []
-    links = []
-    is_nsfw = []
-    for row in the_dict["data"]:
-        times.append(float(row["time"]))
-        tips.append(float(row["amount"]))
-        links.append("https://open.lbry.com/" + str(row["claim_name"]) + ":"\
-                            + str(row["claim_id"]))
-        is_nsfw.append(row["is_nsfw"])
-        if row["tot"] > 0:
-            is_tip.append(True)
-        else:
-            is_tip.append(False)
-
-    times = np.array(times)
-    tips = np.array(tips)
-    is_tip = np.array(is_tip)
-    links = np.array(links)
-    is_nsfw = np.array(is_nsfw)
-
-    # Write tips
     for i in range(len(labels)):
-        keep = (times > (now - windows[i])) & is_tip
-        _times = times[keep]
-        _tips = tips[keep]
-        _links = links[keep]
-        _is_nsfw = is_nsfw[keep]
-        result["num_tips_{label}".format(label=labels[i])] = len(_tips)
-        result["lbc_tipped_{label}".format(label=labels[i])] = float(_tips.sum())
-        maxtip = 0
-        maxtip_link = None
-        maxtip_is_nsfw = None
-        if len(_tips) > 0:
-            maxtip = float(_tips.max())
-            index = np.argmax(_tips)
-            maxtip_link = _links[index]
-            maxtip_is_nsfw = _is_nsfw[index]
-        result["biggest_tip_{label}".format(label=labels[i])] = maxtip
-        result["biggest_tip_{label}_link".format(label=labels[i])] = maxtip_link
-        result["biggest_tip_{label}_is_nsfw".format(label=labels[i])] = bool(maxtip_is_nsfw)
+        # Count and aggregate tips and supports for the time window
+        query = \
+                """
+                SELECT
+                    COUNT(support_amount) num,
+                    EXP(AVG(LOG(support_amount))) size,
+                    MAX(support_amount) max
+                FROM
+                    support
+                WHERE
+                    created_at > FROM_UNIXTIME({now} - {window})
+                """.format(now=now, window=windows[i])
 
-    # Write supports
-    for i in range(len(labels)):
-        keep = (times > (now - windows[i])) & (~is_tip)
-        _times = times[keep]
-        _tips = tips[keep]
-        _links = links[keep]
-        _is_nsfw = is_nsfw[keep]
-        result["num_supports_{label}".format(label=labels[i])] = len(_tips)
-        result["lbc_supports_{label}".format(label=labels[i])] = float(_tips.sum())
-        maxtip = 0
-        maxtip_link = None
-        maxtip_is_nsfw = None
-        if len(_tips) > 0:
-            maxtip = float(_tips.max())
-            index = np.argmax(_tips)
-            maxtip_link = _links[index]
-            maxtip_is_nsfw = _is_nsfw[index]
-        result["biggest_support_{label}".format(label=labels[i])] = maxtip
-        result["biggest_support_{label}_link".format(label=labels[i])] = maxtip_link
-        result["biggest_support_{label}_is_nsfw".format(label=labels[i])] = bool(maxtip_is_nsfw)
+        request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
+        the_dict = request.json()["data"][0]
+        result["num_{label}".format(label=labels[i])] = the_dict["num"]
+        result["typical_{label}".format(label=labels[i])] = the_dict["size"]
+        result["biggest_{label}".format(label=labels[i])] = the_dict["max"]
 
-    f = open("tips_stats.json", "w")
+        # Get claim name and ID for max
+        query = \
+                """
+                SELECT
+                    name, claim_id, is_nsfw
+                FROM
+                    support
+                        INNER JOIN
+                    claim
+                        ON
+                    supported_claim_id = claim_id
+                WHERE
+                    support_amount = {amount}
+                """.format(amount=the_dict["max"])
+        request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
+        the_dict = request.json()["data"][0]
+        result["tv_url_{label}".format(label=labels[i])] = "https://lbry.tv/" \
+                + the_dict["name"] + ":" + the_dict["claim_id"]
+        result["is_nsfw_{label}".format(label=labels[i])] =\
+                bool(the_dict["is_nsfw"])
+
+    f = open("supports_and_tips.json", "w")
     f.write(json.dumps(result))
     f.close()
     print("done. ", flush=True, end="")
@@ -277,7 +238,6 @@ def publish_files():
 
 
 if __name__ == "__main__":
-
     # Do it manually once then enter the infinite loop
     now = time.time()
     print("The time is " + str(datetime.datetime.utcfromtimestamp(int(now))) + " UTC.")
