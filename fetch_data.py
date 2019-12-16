@@ -278,7 +278,7 @@ def subscriber_counts(auth_token, preview=False):
         f = open("subscriber_counts.json", "w")
         import update_rss
         update_rss.update(my_dict["human_time_utc"])
-    f.write(json.dumps(my_dict))
+    f.write(json.dumps(my_dict, indent=2))
     f.close()
 
     conn.close()

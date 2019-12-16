@@ -65,7 +65,7 @@ def make_graph(mode, show=True):
     my_dict["new_{mode}_30_days".format(mode=mode)] = int(\
                 np.sum(times > (now - 30*86400.0)))
     f = open("{mode}_stats.json".format(mode=mode), "w")
-    f.write(json.dumps(my_dict))
+    f.write(json.dumps(my_dict, indent=2))
     f.close()
 
     # Count new claims this UTC day
@@ -192,8 +192,8 @@ def aggregate_tips():
         if i > 0:
             query += \
                 """ WHERE
-                    created_at > FROM_UNIXTIME({now} - {window})
-                """.format(now=now, window=windows[i])
+                    UNIX_TIMESTAMP(created_at) > {cutoff};
+                """.format(cutoff=now - windows[i])
 
         request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
         the_dict = request.json()["data"][0]
@@ -223,7 +223,7 @@ def aggregate_tips():
                 bool(the_dict["is_nsfw"])
 
     f = open("supports_and_tips.json", "w")
-    f.write(json.dumps(result))
+    f.write(json.dumps(result, indent=2))
     f.close()
     print("done. ", flush=True, end="")
 
