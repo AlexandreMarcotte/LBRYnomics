@@ -5,11 +5,29 @@ Get the timestamps of all claims and plot the cumulative number vs. time!
 import datetime
 import json
 import matplotlib.pyplot as plt
+import math
 import numpy as np
 import os
 import requests
 import sqlite3
+import subprocess
 import time
+
+
+# Full path to the lbrynet binary
+lbrynet_bin = "/opt/LBRY/resources/static/daemon/lbrynet"
+
+def daemon_command(command, message="Calling lbrynet daemon..."):
+    """
+    Run a daemon command and return its output.
+    """
+    command = lbrynet_bin + " " + command
+    parts = command.split(" ")
+    output = subprocess.run(parts, capture_output=True)
+    return json.loads(output.stdout)
+
+
+
 
 def make_graph(mode, show=True):
     """
@@ -176,15 +194,24 @@ def aggregate_tips():
     result["unix_time"] = now
     result["human_time_utc"] =\
                     str(datetime.datetime.utcfromtimestamp(int(now))) + " UTC"
+    block = daemon_command("status")["wallet"]["blocks"]
+
+    # Open the DB
+    db_file = "/home/brewer/local/lbry-sdk/lbry/lbryum_data/claims.db"
+    conn = sqlite3.connect(db_file)
+    c = conn.cursor()
+    conn.create_function("log", 1, math.log)
+    conn.create_function("exp", 1, math.exp)
 
     for i in range(len(labels)):
+
         # Count and aggregate tips and supports for the time window
         query = \
                 """
                 SELECT
-                    COUNT(support_amount) num,
-                    EXP(AVG(LOG(support_amount))) size,
-                    MAX(support_amount) max
+                    COUNT(amount) num,
+                    exp(AVG(log(amount))) size,
+                    MAX(amount) max
                 FROM
                     support
                 """
@@ -192,39 +219,66 @@ def aggregate_tips():
         if i > 0:
             query += \
                 """ WHERE
-                    UNIX_TIMESTAMP(created_at) > {cutoff};
-                """.format(cutoff=now - windows[i])
+                    height >= {cutoff};
+                """.format(cutoff=block - windows[i]/(2.5*60))
 
-        request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
-        the_dict = request.json()["data"][0]
-        result["num_{label}".format(label=labels[i])] = the_dict["num"]
-        result["typical_{label}".format(label=labels[i])] = the_dict["size"]
-        result["biggest_{label}".format(label=labels[i])] = the_dict["max"]
+        for row in c.execute(query):
+            biggest = row[2]
+            result["num_{label}".format(label=labels[i])] = row[0]
+            result["typical_{label}".format(label=labels[i])] = row[1]/1.0E8
+            result["biggest_{label}".format(label=labels[i])] = row[2]/1.0E8
+            break
 
         # Get claim name and ID for max
         query = \
                 """
                 SELECT
-                    name, claim_id, is_nsfw
+                    claim_name, claim_id
                 FROM
-                    support
-                        INNER JOIN
-                    claim
-                        ON
-                    supported_claim_id = claim_id
+                    claim INNER JOIN support ON claim.claim_hash = support.claim_hash
                 WHERE
-                    support_amount = {amount}
-                """.format(amount=the_dict["max"])
-        request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
-        the_dict = request.json()["data"][0]
+                    support.amount = {amount}
+                """.format(amount=biggest)
+
+        if i > 0:
+            query += \
+                """ AND
+                    support.height >= {cutoff};
+                """.format(cutoff=block - windows[i]/(2.5*60))
+
+        for row in c.execute(query):
+            claim_name, claim_id = row[0:2]
+
         result["tv_url_{label}".format(label=labels[i])] = "https://lbry.tv/" \
-                + the_dict["name"] + ":" + the_dict["claim_id"]
-        result["is_nsfw_{label}".format(label=labels[i])] =\
-                bool(the_dict["is_nsfw"])
+                + claim_name + ":" + claim_id
+
+        # Get claim name and ID for max
+        query = \
+                """
+                SELECT
+                    COUNT(claim_id)
+                FROM
+                    claim INNER JOIN tag ON claim.claim_hash = tag.claim_hash
+                    INNER JOIN support ON support.claim_hash = claim.claim_hash
+                WHERE ((tag.tag = "mature" OR tag.tag = "nsfw" OR
+                       tag.tag = "porn" OR tag.tag = "xxx")
+                      AND support.amount = {amount})
+                """.format(amount=biggest)
+
+        if i > 0:
+            query += \
+                """ AND
+                    support.height >= {cutoff};
+                """.format(cutoff=block - windows[i]/(2.5*60))
+
+        for row in c.execute(query):
+            result["is_nsfw_{label}".format(label=labels[i])] = row[0] != 0
+            break
 
     f = open("supports_and_tips.json", "w")
     f.write(json.dumps(result, indent=2))
     f.close()
+    conn.close()
     print("done. ", flush=True, end="")
 
 
