@@ -151,28 +151,29 @@ def subscriber_counts(auth_token, preview=False):
     vanity_names = np.array(vanity_names)
     claim_ids = np.array(claim_ids)
 
-#    # Now get number of claims in each channel from chainquery
-#    print("Waiting for chainquery...", flush=True, end="")
-#    query = "SELECT COUNT(claim_id) num, publisher_id FROM claim\
-#                GROUP BY publisher_id\
-#                HAVING num > 0;"
-#    request = requests.get("https://chainquery.lbry.com/api/sql?query=" + query)
-#    the_dict = request.json()
-#    print("done.")
+    # Now get number of claims in each channel from chainquery
+    query = \
+"""
+select c2.claim_id claim_ids, count(*) num_claims
+    from claim c1 inner join claim c2 on c2.claim_hash = c1.channel_hash
+    group by c2.claim_hash
+    having num_claims > 0;
+"""
 
-#    print("Filtering channel list to exclude those with no publications...", flush=True, end="")
-#    claims_with_content = []
-#    for row in the_dict["data"]:
-#        claims_with_content.append(row["publisher_id"])
-#    include = np.zeros(len(claim_ids), dtype=bool)
-#    for i in range(len(claim_ids)):
-#        include[i] = claim_ids[i] in claims_with_content
-#    print("done.")
+    claims_with_content = {}
+    k = 0
+    for row in c.execute(query):
+        claims_with_content[row[0]] = None
+        k += 1
+        print("Getting channels with content...found {k} so far.".format(k=k))
 
-#    vanity_names = vanity_names[include]
-#    claim_ids = claim_ids[include]
-#    print("{num} channels remain.".format(num=include.sum()))
+    start = time.time()
+    include = np.zeros(len(claim_ids), dtype=bool)
+    for i in range(len(claim_ids)):
+        include[i] = claim_ids[i] in claims_with_content
 
+    vanity_names = vanity_names[include]
+    claim_ids = claim_ids[include]
 
     k = 0
     while True:
