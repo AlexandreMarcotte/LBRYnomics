@@ -189,20 +189,29 @@ select c2.claim_id claim_ids, count(*) num_claims
         if final:
             end = len(claim_ids)
 
-        # Prepare the request to the LBRY API
-        url = "https://api.lbry.com/subscription/sub_count?auth_token=" +\
-                    auth_token + "&claim_id="
-        for i in range(start, end):
-            url += claim_ids[i] + ","
-        url = url[0:-1] # No final comma
+        
+        # Attempt the request until it succeeds
+        while True:
 
-        f = open("url.txt", "w")
-        f.write(url)
-        f.close()
+            # Prepare the request to the LBRY API
+            url = "https://api.lbry.com/subscription/sub_count?auth_token=" +\
+                        auth_token + "&claim_id="
+            for i in range(start, end):
+                url += claim_ids[i] + ","
+            url = url[0:-1] # No final comma
 
-        # Do the request
-        result = requests.get(url)
-        result = result.json()
+            f = open("url.txt", "w")
+            f.write(url)
+            f.close()
+
+            try:
+                # Do the request
+                result = requests.get(url)
+                result = result.json()
+                break
+            except:
+                time.sleep(3.0)
+                pass
 
         # Get sub counts from the result and put them in the subscribers list
         for x in result["data"]:
