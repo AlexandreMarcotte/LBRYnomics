@@ -178,11 +178,13 @@ select c2.claim_id claim_ids, count(*) num_claims
     k = 0
     while True:
         """
-        Go in batches of 100
+        Go in batches of 50 with a pause in between
         """
+        time.sleep(5.0)
+
         # Cover a certain range of channels
-        start = 100*k
-        end = 100*(k+1)
+        start = 50*k
+        end = 50*(k+1)
         final = end >= len(claim_ids)
         if final:
             end = len(claim_ids)
@@ -195,14 +197,10 @@ select c2.claim_id claim_ids, count(*) num_claims
         url = url[0:-1] # No final comma
 
         # Do the request
-        try:
-            result = requests.get(url)
-        except:
-            print("Something went wrong")
-            return
+        result = requests.get(url)
+        result = result.json()
 
         # Get sub counts from the result and put them in the subscribers list
-        result = result.json()
         for x in result["data"]:
             subscribers.append(x)
             i = len(subscribers)-1
