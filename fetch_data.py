@@ -178,13 +178,13 @@ select c2.claim_id claim_ids, count(*) num_claims
     k = 0
     while True:
         """
-        Go in batches of 50 with a pause in between
+        Go in batches of 100 with a pause in between
         """
-        time.sleep(5.0)
+        time.sleep(3.0)
 
         # Cover a certain range of channels
-        start = 50*k
-        end = 50*(k+1)
+        start = 100*k
+        end = 100*(k+1)
         final = end >= len(claim_ids)
         if final:
             end = len(claim_ids)
@@ -195,6 +195,10 @@ select c2.claim_id claim_ids, count(*) num_claims
         for i in range(start, end):
             url += claim_ids[i] + ","
         url = url[0:-1] # No final comma
+
+        f = open("url.txt", "w")
+        f.write(url)
+        f.close()
 
         # Do the request
         result = requests.get(url)
