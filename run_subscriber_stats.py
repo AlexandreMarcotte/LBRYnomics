@@ -19,7 +19,7 @@ while True:
     gap = time.time() - t
 
     msg = "{d} days until next update.".format(d=(week - gap)/day)
-    print(msg, end="\r", flush=True)
+    print(msg + "        ", end="\r", flush=True)
     time.sleep(1.0 - time.time()%1)
 
     if gap >= week:
