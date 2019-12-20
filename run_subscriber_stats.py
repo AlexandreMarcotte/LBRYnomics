@@ -9,15 +9,23 @@ hour = 3600.0
 day = 24*hour
 week = 7*day
 
+
+f = open("subscriber_counts.json")
+t = json.load(f)["unix_time"]
+f.close()
+
+
 while True:
-    f = open("subscriber_counts.json")
-    t = json.load(f)["unix_time"]
-    f.close()
-
     gap = time.time() - t
-    print("It's been {d} days since the last update."\
-                .format(d=np.round(gap/day, 4)))
 
-    time.sleep(week - gap)
-    subscriber_counts("") # <- Put auth token there as a string
+    msg = "{d} days until next update.".format(d=(week - gap)/day)
+    print(msg, end="\r", flush=True)
+    time.sleep(1.0 - time.time()%1)
+
+    if gap >= week:
+        subscriber_counts("") # <- Put auth token there as a string
+
+        f = open("subscriber_counts.json")
+        t = json.load(f)["unix_time"]
+        f.close()
 
