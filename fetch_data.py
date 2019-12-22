@@ -252,7 +252,8 @@ select c2.claim_id claim_ids, count(*) num_claims
     my_dict["rank_change"] = []
     my_dict["is_nsfw"] = []
 
-    grey_list = ["f24ab6f03d96aada87d4e14b2dac4aa1cee8d787"]
+    grey_list = ["f24ab6f03d96aada87d4e14b2dac4aa1cee8d787",
+                 "fd4b56c7216c2f96db4b751af68aa2789c327d48"]
 
     for i in range(100):
         my_dict["ranks"].append(i+1)
