@@ -317,7 +317,7 @@ if __name__ == "__main__":
 
     while True:
         print("", flush=True)
-        time.sleep(600.0 - duration)
+        time.sleep(300.0 - duration)
 
         start = time.time()
         print("The time is " + str(datetime.datetime.utcfromtimestamp(int(start))) + " UTC.")
