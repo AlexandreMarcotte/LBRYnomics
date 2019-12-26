@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `measurements` (
 );""")
 
 
-# The queries used into
+# The queries used
 queries = ["""
 SELECT SUM(amount)/1E8 AS deposits,
        SUM(support_amount)/1E8 AS supports,
@@ -41,9 +41,34 @@ INSERT INTO measurements (time, deposits, supports, num_claims, num_supports)
 """]
 
 
+def create_plot():
+    q = "SELECT time, deposits, supports FROM measurements;"
+    time = []
+    deposits = []
+    supports = []
+    for row in data_db_cursor.execute(q):
+        t, d, s = row
+        time.append(t)
+        deposits.append(d)
+        supports.append(s)
+
+    import matplotlib.pyplot as plt
+    plt.figure(figsize=(14, 6))
+    plt.subplot(1, 2, 1)
+    plt.plot(time, deposits, label="LBC in Deposits")
+    plt.xlabel("Time")
+    plt.ylabel("LBC")
+    plt.subplot(1, 2, 2)
+    plt.plot(time, supports, label="LBC in Supports")
+    plt.ylabel("LBC")
+
+    plt.savefig("lbc_deposited.svg")
+    plt.close("all")
 
 # Main loop
-for i in range(1):
+while True:
+
+    print("Making measurements...", end="", flush=True)
 
     # Get current unix time
     now = time.time()
@@ -57,13 +82,21 @@ for i in range(1):
 
     data_db_cursor.execute(queries[2], tuple(measurement))
     data_db_cursor.execute("COMMIT;")
+    print("done.")
+
+    # Create plot
+    print("Creating plot...", end="", flush=True)
+    create_plot()
+    print("done.")
 
     # Calculate wait time
     duration = time.time() - now
     wait = 300.0 - duration
     if wait <= 0.0:
         wait = 1.0
+    print("Waiting...", end="", flush=True)
     time.sleep(wait)
+    print("done.")
 
 # Close connections
 claims_db.close()
