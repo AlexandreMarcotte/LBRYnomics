@@ -53,15 +53,16 @@ def create_plot():
         supports.append(s)
 
     import matplotlib.pyplot as plt
+
     plt.figure(figsize=(14, 6))
     plt.subplot(1, 2, 1)
     plt.plot(time, deposits)
     plt.title("LBC in Deposits")
-    plt.xlabel("Time")
     plt.ylabel("LBC")
+
     plt.subplot(1, 2, 2)
     plt.plot(time, supports)
-    plt.ylabel("LBC")
+    plt.xlabel("Time")
     plt.title("LBC in Supports")
 
     plt.savefig("lbc_deposited.svg")
