@@ -58,6 +58,7 @@ def create_plot():
     plt.subplot(1, 2, 1)
     plt.plot(time, deposits)
     plt.title("LBC in Deposits")
+    plt.xlabel("Time")
     plt.ylabel("LBC")
 
     plt.subplot(1, 2, 2)
