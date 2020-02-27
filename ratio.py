@@ -72,8 +72,8 @@ if success:
         bins.append(bins[-1] - 1/24)
     bins = bins[::-1]
 
-    plt.hist(up_times,   bins=bins, alpha=0.4, label="Uploaded")
-    plt.hist(down_times, bins=bins, alpha=0.4, label="Downloaded")
+    plt.hist(down_times, bins=bins, alpha=0.5, label="Downloaded")
+    plt.hist(up_times,   bins=bins, alpha=0.5, label="Uploaded")
     plt.legend()
     plt.xlabel("Time (days)")
     plt.ylabel("Blobs per hour")
